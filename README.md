@@ -73,7 +73,7 @@
       used in product.py
       generete correlation_map iteratively
 
-## 5. ***statistics.py***
+## 5. ***auctioneer.py***
 ### 5.1 Variables
 * ***price_series*** (pd.DataFrame)
       record price for each product seller in each tick
