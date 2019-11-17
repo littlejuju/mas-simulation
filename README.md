@@ -35,6 +35,7 @@
 * *name* (str): seller name
 * *❌product*
 * ***product_list*** (list): list of products this seller sells
+* ***product_storage*** (dict): record of product storage
 * ***email*** (str): email account of this seller (for receiving cheating data sheet)
 * ***sales_history & profit_history & expense_history & sentiment_history & item_sold*** (dict):
       all original variables have to be altered to dict
