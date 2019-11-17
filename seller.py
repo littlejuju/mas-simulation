@@ -12,15 +12,16 @@ import random
 
 class Seller(object):
 
-    def __init__(self, name, product_list, wallet, email = 'zhuxiangqi314@gmail.com'):
+    def __init__(self, name, product_dict, wallet, email = 'zhuxiangqi314@gmail.com'):
         self.name = name
-        self.product_list = product_list
-        self.product = product_list
+        self.product_storage = product_dict
+        self.product_list = [product for product in product_dict]
+#        self.product = product_list
         self.wallet = wallet
         self.email = email
 
         # register the seller in market
-        Market.register_seller(self, product_list)
+        Market.register_seller(self, self.product_list)
         
 
         # metrics tracker
@@ -34,6 +35,7 @@ class Seller(object):
         self.expense_history = dict()
         self.sentiment_history = dict()
         self.item_sold = dict()
+        
         for product in self.product_list:
             self.sales_history[product] = list()
             self.revenue_history[product] = list()

@@ -17,8 +17,8 @@ iphone = Product(name='iphone', product_id = 0, price=300, quality=0.9, prob_map
 galaxy = Product(name='galaxy', product_id = 1, price=200, quality=0.8, prob_map = {'iphone':[(0,0.2)]})
 
 # Create a Seller with some budget
-seller_apple = Seller(name='apple', product_list=[iphone], wallet=1000, email = 'a0195470yreceiver@gmail.com')
-seller_samsung = Seller(name='samsung', product_list=[galaxy], wallet=500, email = 'a0159419u.receiver@gmail.com')
+seller_apple = Seller(name='apple', product_dict={iphone:100}, wallet=1000, email = 'a0195470yreceiver@gmail.com')
+seller_samsung = Seller(name='samsung', product_dict={galaxy:110}, wallet=500, email = 'a0159419u.receiver@gmail.com')
 
 # Wait till the simulation ends
 try:
