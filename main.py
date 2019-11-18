@@ -33,7 +33,7 @@ seller_samsung = Seller(name='samsung', product_dict={galaxy: 110}, wallet=500, 
 
 # Wait till the simulation ends
 try:
-    time.sleep(100)
+    time.sleep(20)
 except KeyboardInterrupt:
     pass
 

@@ -13,6 +13,7 @@ import random
 class Seller(object):
 
     def __init__(self, name, product_dict, wallet, statistics, email = 'zhuxiangqi314@gmail.com'):
+        self.count = 0
         self.name = name
         self.product_storage = product_dict
         self.product_list = [product for product in product_dict]
@@ -58,8 +59,10 @@ class Seller(object):
         self.thread.start()
 
     def loop(self):
+
         while not self.STOP:
             self.tick()
+            self.count += 0
             time.sleep(tick_time)
 
     # if an item is sold, add it to the database
@@ -96,17 +99,21 @@ class Seller(object):
 
     
             # choose what to do for next timestep
-            advert_type, scale = self.CEO_advertisement(product)
+
     
             # ANSWER a. print data to show progress
             print('\nProduct in previous quarter: ' + product.name)
             print('Revenue in previous quarter:', self.my_revenue(product, True))
             print('Expenses in previous quarter:', self.my_expenses(product, True))
             print('Profit in previous quarter:', self.my_profit(product, True))
-            print('\nStrategy for next quarter \nAdvert Type: {}, scale: {}\n\n'.format(advert_type, scale))
+            if self.wallet > 50 and self.profit_history[product][-1] > -1 and sum(self.profit_history[product]) > - 10:
+                advert_type, scale = self.CEO_advertisement(product)
+                print('\nStrategy for next quarter \nAdvert Type: {}, scale: {}\n\n'.format(advert_type, scale))
     
             # perform the actions and view the expense
-            self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale))
+                self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale))
+            else:
+                self.expense_history[product].append(0)
 
 
 
@@ -141,6 +148,9 @@ class Seller(object):
     """function1 price decision
     return price addition (can be negative)"""
     def CEO_price(self, product):
+        if self.count < 30:
+            add_price = int(10 * (random.random() - 0.5))
+            return add_price
         data_cheating = False
         if random.random() > 0.7:
             self.statistics.send_data(self)
