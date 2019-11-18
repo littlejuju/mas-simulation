@@ -13,7 +13,7 @@ random.seed(seed)
 # create auctioneer 'dataCenter'
 dataCenter = Statistics('dataCenter')
 # Create some Consumers
-customers = [Customer(name='consumer_' + str(i), wallet=500, statistics = dataCenter, price_tolerance=0.5 + 0.4 * random.random()) for i in range(500)]
+customers = [Customer(name='consumer_' + str(i), wallet=500, statistics = dataCenter, price_tolerance=0.5 + 0.4 * random.random(), quality_tolerance=0.5 + 0.4 * random.random()) for i in range(500)]
 
 # Create a product
 iphone = Product(name='iphone', product_id = 0, price=300, quality=0.9, prob_map = {'galaxy':[(1,0.1)]})
