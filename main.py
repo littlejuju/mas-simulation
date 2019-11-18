@@ -6,7 +6,7 @@ from customer import Customer
 from product import Product
 from seller import Seller
 from utils import plot
-from auctioneer import Statistics
+from DataCenter import Statistics
 
 random.seed(seed)
 
