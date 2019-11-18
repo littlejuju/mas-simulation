@@ -10,18 +10,18 @@ from DataCenter import Statistics
 
 random.seed(seed)
 
-# create auctioneer 'xianyu'
-xianyu = Statistics('xianyu')
+# create auctioneer 'dataCenter'
+dataCenter = Statistics('dataCenter')
 # Create some Consumers
-customers = [Customer(name='consumer_' + str(i), wallet=500, statistics = xianyu, price_tolerance=0.5 + 0.4 * random.random()) for i in range(500)]
+customers = [Customer(name='consumer_' + str(i), wallet=500, statistics = dataCenter, price_tolerance=0.5 + 0.4 * random.random()) for i in range(500)]
 
 # Create a product
 iphone = Product(name='iphone', product_id = 0, price=300, quality=0.9, prob_map = {'galaxy':[(1,0.1)]})
 galaxy = Product(name='galaxy', product_id = 1, price=200, quality=0.8, prob_map = {'iphone':[(0,0.2)]})
 
 # Create a Seller with some budget
-seller_apple = Seller(name='apple', product_dict={iphone:100}, wallet=1000, statistics = xianyu, email = 'a0195470yreceiver@gmail.com')
-seller_samsung = Seller(name='samsung', product_dict={galaxy:110}, wallet=500, statistics = xianyu, email = 'a0159419u.receiver@gmail.com')
+seller_apple = Seller(name='apple', product_dict={iphone:100}, wallet=1000, statistics = dataCenter, email ='a0195470yreceiver@gmail.com')
+seller_samsung = Seller(name='samsung', product_dict={galaxy:110}, wallet=500, statistics = dataCenter, email ='a0159419u.receiver@gmail.com')
 
 # Wait till the simulation ends
 try:
@@ -46,7 +46,7 @@ for product in seller_samsung.product_list:
 for consumer in customers:
     consumer.kill()
 
-xianyu.kill()
+dataCenter.kill()
 
 #from market import Market
 #correlation_map = Market.correlation_map
