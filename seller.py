@@ -70,10 +70,11 @@ class Seller(object):
 
     # one timestep in the simulation world
     def tick(self):
-        self.lock.acquire()
+
         """ in each tick, each product will be considered iteratively 
         while in CEO decsion function, all products will be considered in each decsion"""
         for product in self.product_list:
+            self.lock.acquire()
 
             # append the sales record to the history
             self.sales_history[product].append(self.item_sold[product])
@@ -81,7 +82,7 @@ class Seller(object):
             # reset the sales counter
             self.item_sold[product] = 0
     
-            self.lock.release()
+
     
             # Calculate the metrics for previous tick and add to tracker
             self.revenue_history[product].append(self.sales_history[product][-1] * self.price_history[product][-1])
@@ -91,7 +92,8 @@ class Seller(object):
     
             # add the profit to seller's wallet
             self.wallet += self.my_profit(product, True)
-            
+            self.lock.release()
+
     
             # choose what to do for next timestep
             advert_type, scale = self.CEO_advertisement(product)
@@ -105,6 +107,8 @@ class Seller(object):
     
             # perform the actions and view the expense
             self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale))
+
+
 
     # calculates the total revenue. Gives the revenue in last tick if latest_only = True
     def my_revenue(self, product, latest_only=False):

@@ -17,15 +17,17 @@ customers = [Customer(name='consumer_' + str(i), wallet=500, statistics = dataCe
 
 # Create a product
 iphone = Product(name='iphone', product_id = 0, price=300, quality=0.9, prob_map = {'galaxy':[(1,0.1)]})
-galaxy = Product(name='galaxy', product_id = 1, price=200, quality=0.8, prob_map = {'iphone':[(0,0.2)]})
+galaxy = Product(name='galaxy', product_id = 1, price=200, quality=0.7, prob_map = {'iphone':[(0,0.2)]})
+huawei = Product(name='huawei', product_id = 2, price = 220, quality = 0.85, prob_map={'iphone':[(0,0.05)],'galaxy':[(1, 0.02)]})
+#
 
 # Create a Seller with some budget
-seller_apple = Seller(name='apple', product_dict={iphone:100}, wallet=1000, statistics = dataCenter, email ='a0195470yreceiver@gmail.com')
+seller_apple = Seller(name='apple', product_dict={iphone:70, huawei:50}, wallet=1000, statistics = dataCenter, email ='a0195470yreceiver@gmail.com')
 seller_samsung = Seller(name='samsung', product_dict={galaxy:110}, wallet=500, statistics = dataCenter, email ='a0159419u.receiver@gmail.com')
 
 # Wait till the simulation ends
 try:
-    time.sleep(10)
+    time.sleep(100)
 except KeyboardInterrupt:
     pass
 
