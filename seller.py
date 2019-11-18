@@ -7,18 +7,19 @@ from constants import tick_time
 from google_ads import GoogleAds
 from market import Market
 from twitter import Twitter
-from auctioneer import Statistics
+#from auctioneer import Statistics
 import random
 
 class Seller(object):
 
-    def __init__(self, name, product_dict, wallet, email = 'zhuxiangqi314@gmail.com'):
+    def __init__(self, name, product_dict, wallet, statistics, email = 'zhuxiangqi314@gmail.com'):
         self.name = name
         self.product_storage = product_dict
         self.product_list = [product for product in product_dict]
 #        self.product = product_list
         self.wallet = wallet
         self.email = email
+        self.statistics = statistics
 
         # register the seller in market
         Market.register_seller(self, self.product_list)
@@ -45,7 +46,7 @@ class Seller(object):
             self.item_sold[product] = 0
             self.price_history[product] = [product.price + self.CEO_price(product)]
             product.add_seller(self)
-            Statistics.register_data(obj_data = [product, self], register_type = 'seller')
+            statistics.register_data(obj_data = [product, self], register_type = 'seller')
 
         # Flag for thread
         self.STOP = False
@@ -138,7 +139,7 @@ class Seller(object):
     def CEO_price(self, product):
         data_cheating = False
         if random.random() > 0.7:
-            Statistics.send_data(self)
+            self.statistics.send_data(self)
             data_cheating = True
         if data_cheating:
             add_price = 0

@@ -8,19 +8,20 @@ from constants import tick_time, seed
 from google_ads import GoogleAds
 from market import Market
 from twitter import Twitter
-from auctioneer import Statistics
+#from auctioneer import Statistics
 
 random.seed(seed)
 
 
 class Customer(object):
-    def __init__(self, name, wallet, price_tolerance = 0.5, quality_tolerance = 0.5):
+    def __init__(self, name, wallet, statistics, price_tolerance = 0.5, quality_tolerance = 0.5):
         self.name, self.wallet  = name, wallet
         self.price_tolerance, self.quality_tolerance = price_tolerance, quality_tolerance
+        self.statistics = statistics
 
         # Register the user with google ads
         GoogleAds.register_user(self)
-        Statistics.register_data(self, register_type = 'customer')
+        self.statistics.register_data(self, register_type = 'customer')
 
         # ad space stores all the adverts consumed by this user
         self.ad_space = set()
