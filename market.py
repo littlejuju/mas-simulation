@@ -47,6 +47,7 @@ class Market(object):
         seller_index = int(len(seller_list)* random.random())
         seller = seller_list[seller_index]
         seller.sold(product)
+        Market.catalogue[product][seller] -= 1
         # deduct price from user's balance
         buyer.deduct(seller.price_history[product][-1])
 
