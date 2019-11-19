@@ -73,6 +73,9 @@
 * ***register_correlation_matrix(product)*** (void)
       used in product.py
       generete correlation_map iteratively
+* ***buy(customer, product)*** (seller)
+      choose seller from product seller list
+      buy product
 
 ## 5. ***DataCenter.py***
 ### 5.1 Variables
