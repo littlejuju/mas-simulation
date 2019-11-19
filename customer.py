@@ -90,10 +90,12 @@ class Customer(object):
 
             # purchase the product from market
         seller = Market.buy(self, product)
-        self.dataCenter.data_ranking(obj_data=[self, product, seller], data_type ='customer')
+        if seller != 0:
+            self.dataCenter.data_ranking(obj_data=[self, product, seller], data_type ='customer')
+            self.owned_products.add(product)
 
         # add product to the owned products list
-        self.owned_products.add(product)
+
 
     # money is deducted from user's wallet when purchase is completed
     def deduct(self, money):

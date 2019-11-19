@@ -44,14 +44,18 @@ class Market(object):
         seller_list = [seller for seller in storage_dict if storage_dict[seller] > 0]
 
         # call seller's sold function
-        seller_index = int(len(seller_list)* random.random())
-        seller = seller_list[seller_index]
-        seller.sold(product)
-        Market.catalogue[product][seller] -= 1
-        # deduct price from user's balance
-        buyer.deduct(seller.price_history[product][-1])
+        if len(seller_list) > 0:
+            seller_index = int(len(seller_list)* random.random())
+            seller = seller_list[seller_index]
+            seller.sold(product)
+            Market.catalogue[product][seller] -= 1
+            # deduct price from user's balance
+            buyer.deduct(seller.price_history[product][-1])
 
-            # track user
-        GoogleAds.track_user_purchase(buyer, product)
-        Market.lock.release()
-        return seller
+                # track user
+            GoogleAds.track_user_purchase(buyer, product)
+            Market.lock.release()
+            return seller
+        else:
+            Market.lock.release()
+            return 0
