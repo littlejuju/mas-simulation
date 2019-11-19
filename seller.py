@@ -7,12 +7,12 @@ from constants import tick_time
 from google_ads import GoogleAds
 from market import Market
 from twitter import Twitter
-#from auctioneer import Statistics
+#from auctioneer import DataCenter
 import random
 
 class Seller(object):
 
-    def __init__(self, name, product_dict, wallet, statistics, email = 'zhuxiangqi314@gmail.com'):
+    def __init__(self, name, product_dict, wallet, dataCenter, email ='zhuxiangqi314@gmail.com'):
         self.count = 0
         self.name = name
         self.product_storage = product_dict
@@ -20,7 +20,7 @@ class Seller(object):
 #        self.product = product_list
         self.wallet = wallet
         self.email = email
-        self.statistics = statistics
+        self.dataCenter = dataCenter
 
         # register the seller in market
         Market.register_seller(self, self.product_list)
@@ -47,8 +47,8 @@ class Seller(object):
             self.item_sold[product] = 0
             self.price_history[product] = [product.price + self.CEO_price(product)]
             product.add_seller(self)
-            self.statistics.register_data(obj_data = [product, self], register_type = 'seller')
-            print(self.statistics.price_series)
+            self.dataCenter.register_data(obj_data = [product, self], register_type ='seller')
+            print(self.dataCenter.price_series)
 
         # Flag for thread
         self.STOP = False
@@ -77,12 +77,12 @@ class Seller(object):
 
         """ in each tick, each product will be considered iteratively 
         while in CEO decsion function, all products will be considered in each decsion"""
-        self.statistics.seller_info_update(self.count)
+        self.dataCenter.seller_info_update(self.count)
         for product in self.product_list:
             self.lock.acquire()
 
             # append the sales record to the history
-            self.statistics.data_ranking(obj_data = [product, self], data_type = 'seller')
+            self.dataCenter.data_ranking(obj_data = [product, self], data_type ='seller')
             self.sales_history[product].append(self.item_sold[product])
 
     
@@ -154,7 +154,7 @@ class Seller(object):
             return add_price
         data_cheating = False
         if random.random() > 0.7:
-            self.statistics.send_data(self)
+            self.dataCenter.send_data(self)
             data_cheating = True
         if data_cheating:
             add_price = 0

@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 
 """not sure if this is right but I really want to alter this class to a dynamic thread"""
-class Statistics(object):
+class DataCenter(object):
     def __init__(self, name = 'xianyu'):
         self.lock = Lock()
         self.STOP = False

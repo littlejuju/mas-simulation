@@ -6,15 +6,15 @@ from customer import Customer
 from product import Product
 from seller import Seller
 from utils import plot
-from DataCenter import Statistics
+from DataCenter import DataCenter
 from constants import ticks
 
 random.seed(seed)
 
 # create auctioneer 'dataCenter'
-dataCenter = Statistics('dataCenter')
+dataCenter = DataCenter('dataCenter')
 # Create some Consumers
-customers = [Customer(name='consumer_' + str(i), wallet=500, statistics=dataCenter,
+customers = [Customer(name='consumer_' + str(i), wallet=500, dataCenter=dataCenter,
                       crisp_sets=(0.3 + 0.2 * (random.random() - 0.5), 0.7 + 0.2 * (random.random() - 0.5)),
                       price_tolerance=0.5 + 0.4 * random.random(), quality_tolerance=0.5 + 0.4 * random.random()) for i
              in range(500)]
@@ -27,9 +27,9 @@ huawei = Product(name='huawei', product_id=2, price=220, quality=0.85,
 #
 
 # Create a Seller with some budget
-seller_apple = Seller(name='apple', product_dict={iphone: 70, huawei: 50}, wallet=1000, statistics=dataCenter,
+seller_apple = Seller(name='apple', product_dict={iphone: 70, huawei: 50}, wallet=1000, dataCenter=dataCenter,
                       email='a0195470yreceiver@gmail.com')
-seller_samsung = Seller(name='samsung', product_dict={galaxy: 110}, wallet=500, statistics=dataCenter,
+seller_samsung = Seller(name='samsung', product_dict={galaxy: 110}, wallet=500, dataCenter=dataCenter,
                         email='a0159419u.receiver@gmail.com')
 
 # Wait till the simulation ends

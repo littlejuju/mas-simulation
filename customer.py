@@ -9,22 +9,22 @@ from google_ads import GoogleAds
 from market import Market
 from twitter import Twitter
 
-# from auctioneer import Statistics
+# from auctioneer import DataCenter
 
 random.seed(seed)
 
 
 class Customer(object):
-    def __init__(self, name, wallet, statistics, crisp_sets=(0.3, 0.7), price_tolerance=0.5, quality_tolerance=0.5):
+    def __init__(self, name, wallet, dataCenter, crisp_sets=(0.3, 0.7), price_tolerance=0.5, quality_tolerance=0.5):
         self.name, self.wallet = name, wallet
         self.price_tolerance, self.quality_tolerance = price_tolerance, quality_tolerance
-        self.statistics = statistics
+        self.dataCenter = dataCenter
 
         # initialize crisp sets for fuzzy logic
         self.crisp_sets = crisp_sets
         # Register the user with google ads
         GoogleAds.register_user(self)
-        self.statistics.register_data(self, register_type='customer')
+        self.dataCenter.register_data(self, register_type='customer')
 
         # ad space stores all the adverts consumed by this user
         self.ad_space = set()
@@ -90,7 +90,7 @@ class Customer(object):
 
             # purchase the product from market
         seller = Market.buy(self, product)
-        self.statistics.data_ranking(obj_data=[self, product, seller], data_type = 'customer')
+        self.dataCenter.data_ranking(obj_data=[self, product, seller], data_type ='customer')
 
         # add product to the owned products list
         self.owned_products.add(product)
