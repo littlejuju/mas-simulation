@@ -26,9 +26,9 @@ class DataCenter(object):
         list of lists [format('product-seller')]"""
         self.sold_series = [list() for i in range(ticks + 2)]
 
-        """3. sold_series_sublist
-        item in sold_series for each tick"""
-        self.sold_series_sublist = list()
+        # """3. sold_series_sublist
+        # item in sold_series for each tick"""
+        # self.sold_series_sublist = list()
         
         """4. customer_history: record customer purchasing record
         key: customer_name
@@ -77,10 +77,8 @@ class DataCenter(object):
 
 #    @staticmethod
     """function2 seller_info_update (void)
-    if update_type = True, update a new row in price_series
-    else:
-    in the end of each tick, append sold_sublist in the end of sold_series
-    clear sold_series_sublist"""
+    if row number of price_series < count, update a new row in price_series
+    """
     def seller_info_update(self, count):
         self.lock.acquire()
         if self.price_series.shape[0] < count:
