@@ -11,12 +11,12 @@ class Market(object):
 
     # initialise the seller catalogue
     @staticmethod
-    def register_seller(seller, product_list):
+    def register_seller(seller, product_storage):
         Market.lock.acquire()
-        for product in product_list:
+        for product in product_storage:
             if product not in Market.catalogue:
-                Market.catalogue[product] = list()
-            Market.catalogue[product].append(seller)
+                Market.catalogue[product] = dict()
+            Market.catalogue[product][seller] =  product_storage[product]
             
         Market.lock.release()
         
@@ -40,7 +40,8 @@ class Market(object):
     def buy(buyer, product):
         Market.lock.acquire()
         # get the seller for product from catalogue
-        seller_list = Market.catalogue[product]
+        storage_dict = Market.catalogue[product]
+        seller_list = [seller for seller in storage_dict if storage_dict[seller] > 0]
 
         # call seller's sold function
         seller_index = int(len(seller_list)* random.random())

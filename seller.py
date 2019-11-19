@@ -23,7 +23,7 @@ class Seller(object):
         self.dataCenter = dataCenter
 
         # register the seller in market
-        Market.register_seller(self, self.product_list)
+        Market.register_seller(self, self.product_storage)
         
 
         # metrics tracker
