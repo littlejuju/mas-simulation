@@ -86,7 +86,7 @@
 * ***sold_series*** (list)
       record sold product seller each tick
       list of lists [format('product_id-seller')]
-* ***sold_series_sublist*** (list): item in sold_series for each tick
+      len: constants.tick + 2 (in case some sellers are killed later than others)
 * ***customer_history*** (dict)
       record customer purchasing record
       key: customer_name
@@ -94,10 +94,7 @@
 
 ### 5.2 Functions
 * ***seller_info_update(count, update_type = True)*** (void):
-      if update_type = True, update a new row in price_series
-      else:
-      in the end of each tick, append sold_sublist in the end of sold_series
-      clear sold_series_sublist
+      f row number of price_series < count, update a new row in price_series
 * ***register_data(obj_data, register_type)*** (void)
       initialize names and keys of statistics data
 * ***data_ranking(obj_data, data_type)*** (void)
