@@ -100,20 +100,17 @@ class Seller(object):
     
             # choose what to do for next timestep
 
+            advert_type, scale = self.CEO_advertisement(product)
     
             # ANSWER a. print data to show progress
             print('\nProduct in previous quarter: ' + product.name)
             print('Revenue in previous quarter:', self.my_revenue(product, True))
             print('Expenses in previous quarter:', self.my_expenses(product, True))
             print('Profit in previous quarter:', self.my_profit(product, True))
-            if self.wallet > 50 and self.profit_history[product][-1] > -1 and sum(self.profit_history[product]) > - 10:
-                advert_type, scale = self.CEO_advertisement(product)
-                print('\nStrategy for next quarter \nAdvert Type: {}, scale: {}\n\n'.format(advert_type, scale))
+            print('\nStrategy for next quarter \nAdvert Type: {}, scale: {}\n\n'.format(advert_type, scale))
     
             # perform the actions and view the expense
-                self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale))
-            else:
-                self.expense_history[product].append(0)
+            self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale))
 
 
 

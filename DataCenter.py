@@ -61,7 +61,9 @@ class Statistics(object):
         self.lock.acquire()
         if register_type == 'seller':
             key = str(obj_data[0].product_id) +'-'+ obj_data[1].name
-            # initialize price_series and sold_series
+            # initialize price_series
+            self.price_series[key] = None
+            # sold_series do not need initializing
         if register_type == 'customer':
             key = obj_data.name
             self.customer_history[key] = list()

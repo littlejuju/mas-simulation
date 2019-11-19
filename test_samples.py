@@ -15,3 +15,17 @@ for key in test_tup:
         print(tup[0])
         
 test_tup = ['a',1]
+
+import pandas as pd
+count = 0
+df = pd.DataFrame()
+print(df)
+df['a'] = None
+print(df)
+df['b'] = None
+print(df)
+while count < 10:
+    df.loc[count] = 3
+    df.loc[count,'a'] = 1
+    count += 1
+print(df)
