@@ -48,6 +48,7 @@ class Seller(object):
             self.price_history[product] = [product.price + self.CEO_price(product)]
             product.add_seller(self)
             self.statistics.register_data(obj_data = [product, self], register_type = 'seller')
+            print(self.statistics.price_series)
 
         # Flag for thread
         self.STOP = False
@@ -81,7 +82,9 @@ class Seller(object):
             self.lock.acquire()
 
             # append the sales record to the history
+            self.statistics.data_ranking(obj_data = [product, self], data_type = 'seller')
             self.sales_history[product].append(self.item_sold[product])
+
     
             # reset the sales counter
             self.item_sold[product] = 0
@@ -112,7 +115,6 @@ class Seller(object):
     
             # perform the actions and view the expense
             self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale))
-        self.statistics.seller_info_update(self.count, update_type = False)
 
 
 

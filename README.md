@@ -82,7 +82,7 @@
       cols = price/tick
 * ***sold_series*** (list)
       record sold product seller each tick
-      list of lists [format('product-seller')]
+      list of lists [format('product_id-seller')]
 * ***sold_series_sublist*** (list): item in sold_series for each tick
 * ***customer_history*** (dict)
       record customer purchasing record

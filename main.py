@@ -7,6 +7,7 @@ from product import Product
 from seller import Seller
 from utils import plot
 from DataCenter import Statistics
+from constants import ticks
 
 random.seed(seed)
 
@@ -33,7 +34,7 @@ seller_samsung = Seller(name='samsung', product_dict={galaxy: 110}, wallet=500, 
 
 # Wait till the simulation ends
 try:
-    time.sleep(20)
+    time.sleep(ticks)
 except KeyboardInterrupt:
     pass
 
@@ -54,7 +55,15 @@ for product in seller_samsung.product_list:
 for consumer in customers:
     consumer.kill()
 
-dataCenter.kill()
 
+dataCenter.kill()
+price_series = dataCenter.price_series
+sold_series = dataCenter.sold_series
+customer_history = dataCenter.customer_history
+print(price_series)
+print(sold_series)
+print(len(sold_series))
+print(customer_history)
+print(len(customer_history))
 # from market import Market
 # correlation_map = Market.correlation_map

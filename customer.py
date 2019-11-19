@@ -89,7 +89,8 @@ class Customer(object):
             return
 
             # purchase the product from market
-        Market.buy(self, product)
+        seller = Market.buy(self, product)
+        self.statistics.data_ranking(obj_data=[self, product, seller], data_type = 'customer')
 
         # add product to the owned products list
         self.owned_products.add(product)

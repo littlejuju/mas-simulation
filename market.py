@@ -1,7 +1,7 @@
 from threading import Lock
 
 from google_ads import GoogleAds
-
+import random
 
 class Market(object):
     
@@ -38,16 +38,18 @@ class Market(object):
     # when a user buys a product, increment the seller's sales
     @staticmethod
     def buy(buyer, product):
+        Market.lock.acquire()
         # get the seller for product from catalogue
         seller_list = Market.catalogue[product]
 
         # call seller's sold function
-        if len(seller_list) == 1:
-            seller = seller_list[0]
-            seller.sold(product)
-    
-            # deduct price from user's balance
-            buyer.deduct(seller.price_history[product][-1])
-    
+        seller_index = int(len(seller_list)* random.random())
+        seller = seller_list[seller_index]
+        seller.sold(product)
+        # deduct price from user's balance
+        buyer.deduct(seller.price_history[product][-1])
+
             # track user
-            GoogleAds.track_user_purchase(buyer, product)
+        GoogleAds.track_user_purchase(buyer, product)
+        Market.lock.release()
+        return seller

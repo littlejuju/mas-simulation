@@ -7,7 +7,7 @@ Created on Sat Nov 16 11:36:57 2019
 import pandas as pd
 from threading import Thread, Lock
 import time
-from constants import tick_time
+from constants import tick_time, ticks
 import matplotlib.pyplot as plt
 
 
@@ -18,13 +18,13 @@ class Statistics(object):
         self.STOP = False
         self.name = name
         """1. price_series: record price for each product seller in each tick
-        name = [format('product-seller')]
+        name = [format('product_id-seller')]
         cols = price/tick"""
         self.price_series = pd.DataFrame()
         
         """2. sold_series: record sold product seller each tick
         list of lists [format('product-seller')]"""
-        self.sold_series = list()
+        self.sold_series = [list() for i in range(ticks + 2)]
 
         """3. sold_series_sublist
         item in sold_series for each tick"""
@@ -81,13 +81,10 @@ class Statistics(object):
     else:
     in the end of each tick, append sold_sublist in the end of sold_series
     clear sold_series_sublist"""
-    def seller_info_update(self, count, update_type = True):
+    def seller_info_update(self, count):
         self.lock.acquire()
-        if update_type:
+        if self.price_series.shape[0] < count:
             self.price_series.loc[count] = None
-        else:
-            self.sold_series.append(self.sold_series_sublist)
-            self.sold_series_sublist = list()
         self.lock.release()
 
 
@@ -100,6 +97,8 @@ class Statistics(object):
             # update price_series and sold_series
             key = str(obj_data[0].product_id) +'-'+ obj_data[1].name
             self.price_series.loc[obj_data[1].count, key] =  obj_data[1].price_history[obj_data[0]][-1]
+            for item in range(len(obj_data[1].item_sold)):
+                self.sold_series[obj_data[1].count].append(key)
         if data_type == 'customer':
             key = obj_data[0].name
             tup = (str(obj_data[1].product_id) +'-'+ obj_data[2].name, obj_data[0].wallet)

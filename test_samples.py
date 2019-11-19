@@ -29,3 +29,8 @@ while count < 10:
     df.loc[count,'a'] = 1
     count += 1
 print(df)
+
+l = [list() for i in range(20)]
+print(len(l))
+
+print(int(0.5))
