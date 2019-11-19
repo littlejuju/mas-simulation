@@ -25,8 +25,12 @@ class Statistics(object):
         """2. sold_series: record sold product seller each tick
         list of lists [format('product-seller')]"""
         self.sold_series = list()
+
+        """3. sold_series_sublist
+        item in sold_series for each tick"""
+        self.sold_series_sublist = list()
         
-        """3. customer_history: record customer purchasing record
+        """4. customer_history: record customer purchasing record
         key: customer_name
         value: list of tuples: (purchased format('product-seller'), wallet)"""
         self.customer_history = dict()
@@ -70,22 +74,39 @@ class Statistics(object):
             # customer_history keys
         self.lock.release()
     
-    """function2 data_ranking (void)
-    record data in each tick in statistics"""
+
 #    @staticmethod
+    """function2 seller_info_update (void)
+    if update_type = True, update a new row in price_series
+    else:
+    in the end of each tick, append sold_sublist in the end of sold_series
+    clear sold_series_sublist"""
+    def seller_info_update(self, count, update_type = True):
+        self.lock.acquire()
+        if update_type:
+            self.price_series.loc[count] = None
+        else:
+            self.sold_series.append(self.sold_series_sublist)
+            self.sold_series_sublist = list()
+        self.lock.release()
+
+
+    """function3 data_ranking (void)
+    record data in each tick in statistics"""
     def data_ranking(self, obj_data, data_type):
         #obj_data = list((customer),product,seller)
         self.lock.acquire()
         if data_type == 'seller':
             # update price_series and sold_series
-            key = str(obj_data[0].product_id) +'-'+ obj_data[1].name   
+            key = str(obj_data[0].product_id) +'-'+ obj_data[1].name
+            self.price_series.loc[obj_data[1].count, key] =  obj_data[1].price_history[obj_data[0]][-1]
         if data_type == 'customer':
             key = obj_data[0].name
             tup = (str(obj_data[1].product_id) +'-'+ obj_data[2].name, obj_data[0].wallet)
             self.customer_history[key].append(tup)
         self.lock.release()
-        
-    """function3 send_data (void)
+
+    """function5 send_data (void)
     1. record data in google sheet
     2. send data in gmail"""
 #    @staticmethod

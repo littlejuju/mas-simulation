@@ -47,7 +47,7 @@ class Seller(object):
             self.item_sold[product] = 0
             self.price_history[product] = [product.price + self.CEO_price(product)]
             product.add_seller(self)
-            statistics.register_data(obj_data = [product, self], register_type = 'seller')
+            self.statistics.register_data(obj_data = [product, self], register_type = 'seller')
 
         # Flag for thread
         self.STOP = False
@@ -62,7 +62,7 @@ class Seller(object):
 
         while not self.STOP:
             self.tick()
-            self.count += 0
+            self.count += 1
             time.sleep(tick_time)
 
     # if an item is sold, add it to the database
@@ -76,6 +76,7 @@ class Seller(object):
 
         """ in each tick, each product will be considered iteratively 
         while in CEO decsion function, all products will be considered in each decsion"""
+        self.statistics.seller_info_update(self.count)
         for product in self.product_list:
             self.lock.acquire()
 
@@ -111,6 +112,7 @@ class Seller(object):
     
             # perform the actions and view the expense
             self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale))
+        self.statistics.seller_info_update(self.count, update_type = False)
 
 
 

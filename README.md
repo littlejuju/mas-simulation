@@ -74,7 +74,7 @@
       used in product.py
       generete correlation_map iteratively
 
-## 5. ***auctioneer.py***
+## 5. ***DataCenter.py***
 ### 5.1 Variables
 * ***price_series*** (pd.DataFrame)
       record price for each product seller in each tick
@@ -83,12 +83,18 @@
 * ***sold_series*** (list)
       record sold product seller each tick
       list of lists [format('product-seller')]
+* ***sold_series_sublist*** (list): item in sold_series for each tick
 * ***customer_history*** (dict)
       record customer purchasing record
       key: customer_name
       value: list of tuples: (purchased format('product-seller'), price)
 
 ### 5.2 Functions
+* ***seller_info_update(count, update_type = True)*** (void):
+      if update_type = True, update a new row in price_series
+      else:
+      in the end of each tick, append sold_sublist in the end of sold_series
+      clear sold_series_sublist
 * ***register_data(obj_data, register_type)*** (void)
       initialize names and keys of statistics data
 * ***data_ranking(obj_data, data_type)*** (void)
