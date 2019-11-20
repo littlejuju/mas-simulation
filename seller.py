@@ -9,6 +9,7 @@ from market import Market
 from twitter import Twitter
 #from auctioneer import DataCenter
 import random
+import pandas as pd
 
 class Seller(object):
 
@@ -21,6 +22,9 @@ class Seller(object):
         self.wallet = wallet
         self.email = email
         self.dataCenter = dataCenter
+        self.CEO_price_training = pd.DataFrame()
+        self.CEO_price_validation = pd.DataFrame()
+        self.customer_record = dict()
 
         # register the seller in market
         Market.register_seller(self, self.product_storage)
@@ -84,6 +88,7 @@ class Seller(object):
             # append the sales record to the history
             self.dataCenter.data_ranking(obj_data = [product, self], data_type ='seller')
             self.sales_history[product].append(self.item_sold[product])
+            self.product_storage[product] -= self.item_sold[product]
 
     
             # reset the sales counter

@@ -15,8 +15,8 @@ random.seed(seed)
 
 
 class Customer(object):
-    def __init__(self, name, wallet, dataCenter, crisp_sets=(0.3, 0.7), price_tolerance=0.5, quality_tolerance=0.5):
-        self.name, self.wallet = name, wallet
+    def __init__(self, name, customer_id, wallet, dataCenter, crisp_sets=(0.3, 0.7), price_tolerance=0.5, quality_tolerance=0.5):
+        self.name, self.customer_id, self.wallet = name, customer_id, wallet
         self.price_tolerance, self.quality_tolerance = price_tolerance, quality_tolerance
         self.dataCenter = dataCenter
 

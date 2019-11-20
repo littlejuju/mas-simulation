@@ -52,7 +52,7 @@ class Market(object):
             # deduct price from user's balance
             buyer.deduct(seller.price_history[product][-1])
 
-                # track user
+            # track user
             GoogleAds.track_user_purchase(buyer, product)
             Market.lock.release()
             return seller

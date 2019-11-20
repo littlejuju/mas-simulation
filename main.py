@@ -14,7 +14,7 @@ random.seed(seed)
 # create auctioneer 'dataCenter'
 dataCenter = DataCenter('dataCenter')
 # Create some Consumers
-customers = [Customer(name='consumer_' + str(i), wallet=500, dataCenter=dataCenter,
+customers = [Customer(name='consumer_' + str(i), customer_id = i, wallet=500, dataCenter=dataCenter,
                       crisp_sets=(0.3 + 0.2 * (random.random() - 0.5), 0.7 + 0.2 * (random.random() - 0.5)),
                       price_tolerance=0.5 + 0.4 * random.random(), quality_tolerance=0.5 + 0.4 * random.random()) for i
              in range(500)]
