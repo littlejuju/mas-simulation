@@ -7,28 +7,30 @@ from constants import tick_time
 from google_ads import GoogleAds
 from market import Market
 from twitter import Twitter
-#from auctioneer import DataCenter
+# from auctioneer import DataCenter
 import random
 import pandas as pd
+from sklearn import linear_model
+from sklearn.preprocessing import PolynomialFeatures
+
 
 class Seller(object):
 
-    def __init__(self, name, product_dict, wallet, dataCenter, email ='zhuxiangqi314@gmail.com'):
+    def __init__(self, name, product_dict, wallet, dataCenter, email='zhuxiangqi314@gmail.com'):
         self.count = 0
         self.name = name
         self.product_storage = product_dict
         self.product_list = [product for product in product_dict]
-#        self.product = product_list
+        #        self.product = product_list
         self.wallet = wallet
         self.email = email
         self.dataCenter = dataCenter
-        self.CEO_price_training = pd.DataFrame()
-        self.CEO_price_validation = pd.DataFrame()
+        self.CEO_price_training = pd.DataFrame(columns=['price', 'revenue'])
+        self.CEO_price_validation = pd.DataFrame(columns=['price', 'revenue'])
         self.customer_record = dict()
 
         # register the seller in market
         Market.register_seller(self, self.product_storage)
-        
 
         # metrics tracker
         """all original variables have to be altered to dict
@@ -41,7 +43,7 @@ class Seller(object):
         self.expense_history = dict()
         self.sentiment_history = dict()
         self.item_sold = dict()
-        
+
         for product in self.product_list:
             self.sales_history[product] = list()
             self.revenue_history[product] = list()
@@ -51,7 +53,7 @@ class Seller(object):
             self.item_sold[product] = 0
             self.price_history[product] = [product.price + self.CEO_price(product)]
             product.add_seller(self)
-            self.dataCenter.register_data(obj_data = [product, self], register_type ='seller')
+            self.dataCenter.register_data(obj_data=[product, self], register_type='seller')
             print(self.dataCenter.price_series)
 
         # Flag for thread
@@ -86,42 +88,36 @@ class Seller(object):
             self.lock.acquire()
 
             # append the sales record to the history
-            self.dataCenter.data_ranking(obj_data = [product, self], data_type ='seller')
+            self.dataCenter.data_ranking(obj_data=[product, self], data_type='seller')
             self.sales_history[product].append(self.item_sold[product])
             self.product_storage[product] -= self.item_sold[product]
 
-    
             # reset the sales counter
             self.item_sold[product] = 0
-    
 
-    
             # Calculate the metrics for previous tick and add to tracker
             self.revenue_history[product].append(self.sales_history[product][-1] * self.price_history[product][-1])
             self.profit_history[product].append(self.revenue_history[product][-1] - self.expense_history[product][-1])
             self.sentiment_history[product].append(self.user_sentiment(product))
             self.price_history[product].append(self.price_history[product][-1] + self.CEO_price(product))
-    
+
             # add the profit to seller's wallet
             self.wallet += self.my_profit(product, True)
             self.lock.release()
 
-    
             # choose what to do for next timestep
 
             advert_type, scale = self.CEO_advertisement(product)
-    
+
             # ANSWER a. print data to show progress
             print('\nProduct in previous quarter: ' + product.name)
             print('Revenue in previous quarter:', self.my_revenue(product, True))
             print('Expenses in previous quarter:', self.my_expenses(product, True))
             print('Profit in previous quarter:', self.my_profit(product, True))
             print('\nStrategy for next quarter \nAdvert Type: {}, scale: {}\n\n'.format(advert_type, scale))
-    
+
             # perform the actions and view the expense
             self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale))
-
-
 
     # calculates the total revenue. Gives the revenue in last tick if latest_only = True
     def my_revenue(self, product, latest_only=False):
@@ -150,23 +146,30 @@ class Seller(object):
 
     def __str__(self):
         return self.name
-    
+
     """function1 price decision
     return price addition (can be negative)"""
+
     def CEO_price(self, product):
+        """1. if count < 30: prepare for training data"""
         if self.count < 30:
+            self.CEO_price_training['price']
             add_price = int(10 * (random.random() - 0.5))
             return add_price
+        """2. decide whether to buy cheating data sheets"""
         data_cheating = False
         if random.random() > 0.7:
             self.dataCenter.send_data(self)
             data_cheating = True
         if data_cheating:
             add_price = 0
+            return add_price
+
         add_price = 0
         return add_price
 
     """ Cognition system that make decisions about advertisement."""
+
     def CEO_advertisement(self, product):
         # WRITE YOUR INTELLIGENT CODE HERE
         # You can use following functions to make decision
@@ -179,5 +182,5 @@ class Seller(object):
         # GoogleAds.advert_price[advert_type] gives you the rate of an advert
 
         advert_type = GoogleAds.ADVERT_BASIC if GoogleAds.user_coverage(product) < 0.5 else GoogleAds.ADVERT_TARGETED
-        scale = self.wallet // GoogleAds.advert_price[advert_type] // 2 #not spending everything
+        scale = self.wallet // GoogleAds.advert_price[advert_type] // 2  # not spending everything
         return advert_type, scale

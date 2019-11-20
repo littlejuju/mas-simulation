@@ -34,3 +34,5 @@ l = [list() for i in range(20)]
 print(len(l))
 
 print(int(0.5))
+CEO_price_training = pd.DataFrame(columns=['price', 'revenue'])
+print(CEO_price_training)
