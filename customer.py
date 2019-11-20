@@ -72,10 +72,10 @@ class Customer(object):
         else:
             cm = 1
         if self.wallet < 200:
-            self.price_tolerance = 0.5
-        else:
             self.price_tolerance = 0.3
-        ratio = cm * ((self.quality_tolerance / self.price_tolerance + user_sentiment) / 2)
+        else:
+            self.price_tolerance = 0.7
+        ratio = cm * ((self.quality_tolerance * self.price_tolerance + user_sentiment) / 2)
 
         # print('\nratio: ', ratio)
 
@@ -88,13 +88,13 @@ class Customer(object):
 
         ratio = self.performance_ratio(product)
         if 0 < ratio < self.crisp_sets[0]:
-            if random.random() < 0.4:
+            if random.random() < 0.05:
                 return True
         if self.crisp_sets[0] < ratio < self.crisp_sets[1]:
-            if random.random() < 0.7:
+            if random.random() < 0.1:
                 return True
         if self.crisp_sets[1] < ratio:
-            if random.random() < 0.9:
+            if random.random() < 0.25:
                 return True
         else:
             return False
