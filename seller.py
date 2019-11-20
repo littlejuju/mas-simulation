@@ -123,8 +123,10 @@ class Seller(object):
             else:
                 budget = 0
                 # perform the actions and view the expense
-            self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale, budget))
-
+            if self.product_storage[product] > 0:
+                self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale, budget))
+            else:
+                self.expense_history[product].append(0)
 
     # calculates the total revenue. Gives the revenue in last tick if latest_only = True
     def my_revenue(self, product, latest_only=False):
