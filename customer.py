@@ -89,13 +89,13 @@ class Customer(object):
 
         ratio = self.performance_ratio(product)
         if 0 < ratio < self.crisp_sets[0]:
-            if random.random() < 0.05:
+            if random.random() < 0.01:
                 return True
         if self.crisp_sets[0] < ratio < self.crisp_sets[1]:
-            if random.random() < 0.1:
+            if random.random() < 0.05:
                 return True
         if self.crisp_sets[1] < ratio:
-            if random.random() < 0.2:
+            if random.random() < 0.15:
                 return True
         else:
             return False
