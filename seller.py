@@ -54,7 +54,7 @@ class Seller(object):
             self.expense_history[product] = [0]
             self.sentiment_history[product] = list()
             self.item_sold[product] = 0
-            self.price_history[product] = [product.price + self.CEO_price(product)]
+            self.price_history[product] = [product.price]
             product.add_seller(self)
             self.dataCenter.register_data(obj_data=[product, self], register_type='seller')
             print(self.dataCenter.price_series)
@@ -163,8 +163,8 @@ class Seller(object):
 
     def CEO_price(self, product):
         """1. record price and revenue into training data set"""
-        self.CEO_price_training[product.name].loc[self.count, 'price'] = self.price_history[product][-1]
-        self.CEO_price_training[product.name].loc[self.count, 'revenue'] = self.revenue_history[product][-1]
+        self.CEO_price_training.loc[self.count, (product.name,'price')] = self.price_history[product][-1]
+        self.CEO_price_training.loc[self.count, (product.name,'revenue')] = self.revenue_history[product][-1]
         """2. if count < 30: prepare for training data and return random add_price for trial runs"""
         if self.count < 30:
             add_price = int(10 * (random.random() - 0.5))
@@ -179,7 +179,8 @@ class Seller(object):
             add_price = 0
             return add_price
         """4. if not cheating"""
-        # 4.1 devide training and validation set
+        # 4.1 divide training and validation set
+
 
 
         add_price = 0
