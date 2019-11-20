@@ -67,8 +67,9 @@ class Customer(object):
                 try:
                     correlation.append(Market.correlation_map[(prod.product_id, product.product_id)])
                 except KeyError:
-                    correlation.append(0)
-            cm = sum(correlation)
+                    correlation.append(0.5)
+        if len(correlation) > 0:
+            cm = sum(correlation)/len(correlation)
         else:
             cm = 1
         if self.wallet < 200:
@@ -94,7 +95,7 @@ class Customer(object):
             if random.random() < 0.1:
                 return True
         if self.crisp_sets[1] < ratio:
-            if random.random() < 0.25:
+            if random.random() < 0.2:
                 return True
         else:
             return False

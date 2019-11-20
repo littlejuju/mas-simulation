@@ -20,12 +20,12 @@ customers = [Customer(name='consumer_' + str(i), customer_id=i, wallet=1000, dat
              in range(500)]
 
 # Create a product
-iphone7 = Product(name='iphone7', product_id=0, price=300, quality=0.9, prob_map={'galaxy': [(1, 0.4)]})
+iphone7 = Product(name='iphone7', product_id=0, price=300, quality=0.9, prob_map={'galaxy': [(1, 0.6)]})
 galaxy = Product(name='galaxy', product_id=1, price=200, quality=0.7, prob_map={'iphone7': [(0, 0.6)]})
 iphone5 = Product(name='iphone5', product_id=2, price=220, quality=0.85,
-                  prob_map={'iphone7': [(0, 0.7)], 'galaxy': [(1, 0.2)]})
+                  prob_map={'iphone7': [(0, 0.7)], 'galaxy': [(1, 0.8)]})
 note = Product(name='note', product_id=3, price=240, quality=0.88,
-               prob_map={'iphone7': [(0, 0.7)], 'iphone5': [(2, 0.3)], 'galaxy': [(1, 0.4)]})
+               prob_map={'iphone7': [(0, 0.7)], 'iphone5': [(2, 0.5)], 'galaxy': [(1, 0.6)]})
 #
 
 # Create a Seller with some budget
