@@ -4,6 +4,7 @@ from threading import Lock, Thread
 import numpy
 
 from constants import tick_time
+from constants import ad_budget_ration
 from google_ads import GoogleAds
 from market import Market
 from twitter import Twitter
@@ -120,8 +121,14 @@ class Seller(object):
             print('Profit in previous quarter:', self.my_profit(product, True))
             print('\nStrategy for next quarter \nAdvert Type: {}, scale: {}\n\n'.format(advert_type, scale))
 
-            # perform the actions and view the expense
-            self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale))
+            # avoid bankrupt
+            if self.count > 1 & self.my_revenue(product, True) > 0:
+                budget = ad_budget_ration * self.my_revenue(product, True)
+            else:
+                budget = 0
+                # perform the actions and view the expense
+            self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale, budget))
+
 
     # calculates the total revenue. Gives the revenue in last tick if latest_only = True
     def my_revenue(self, product, latest_only=False):

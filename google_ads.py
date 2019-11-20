@@ -27,7 +27,7 @@ class GoogleAds(object):
 
     # post an advert about the product
     @staticmethod
-    def post_advertisement(seller, product, advert_type, scale):
+    def post_advertisement(seller, product, advert_type, scale, budget):
         # scale of adverts should not be more than number of users
         scale = min(scale, len(GoogleAds.users))
         GoogleAds.lock.acquire()
@@ -47,17 +47,25 @@ class GoogleAds(object):
 
         # publish the advert to selected user
         scale = len(users)
+        # update the bill into seller's account
+        bill = scale * GoogleAds.advert_price[advert_type]
+
+        # estimate budget and bill
+        if budget != 0 & bill > budget:
+            scale = int(budget/GoogleAds.advert_price[advert_type])
+            users = random.choices(users, k=scale)
+            bill = scale * GoogleAds.advert_price[advert_type]
+
         for user in users:
             user.view_advert(product)
 
-        # update the bill into seller's account
-        bill = scale * GoogleAds.advert_price[advert_type]
         GoogleAds.expenses[seller].append(bill)
 
         GoogleAds.lock.release()
 
         # return the bill amount to the seller
         return bill
+
 
     @staticmethod
     def register_user(user):
