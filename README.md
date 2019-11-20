@@ -5,6 +5,7 @@
 * ***customer_id*** (int): customer_id
 * *wallet* (float): consumer possession
 * *❌tolerance*
+* ***crisp_sets***
 * ***price_tolerance*** (float [0,1]): higher -> consumer tends to buy higher-price products
 * ***quality_tolerance*** (float [0,1]): higher -> consumer tends to buy higher-quality products
 

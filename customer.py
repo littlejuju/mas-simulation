@@ -9,13 +9,18 @@ from google_ads import GoogleAds
 from market import Market
 from twitter import Twitter
 
-# from auctioneer import DataCenter
+from DataCenter import DataCenter
 
 random.seed(seed)
 
 
 class Customer(object):
-    def __init__(self, name, customer_id, wallet, dataCenter, crisp_sets=(0.3, 0.7), price_tolerance=0.5, quality_tolerance=0.5):
+    def __init__(self, name, customer_id, wallet, dataCenter, crisp_sets=(0.3, 0.7), price_tolerance=0.5,
+                 quality_tolerance=0.5):
+        """
+
+        :type dataCenter: DataCenter
+        """
         self.name, self.customer_id, self.wallet = name, customer_id, wallet
         self.price_tolerance, self.quality_tolerance = price_tolerance, quality_tolerance
         self.dataCenter = dataCenter
@@ -56,7 +61,23 @@ class Customer(object):
         # ratio to be finished
         tweets = numpy.asarray(Twitter.get_latest_tweets(product, 100))
         user_sentiment = 1 if len(tweets) == 0 else (tweets == 'POSITIVE').mean()
-        ratio = (self.quality_tolerance / self.price_tolerance + user_sentiment) / 2
+        correlation = list()
+        if len(self.owned_products) > 0:
+            for prod in self.owned_products:
+                try:
+                    correlation.append(Market.correlation_map[(prod.product_id, product.product_id)])
+                except KeyError:
+                    correlation.append(0)
+            cm = sum(correlation)
+        else:
+            cm = 1
+        if self.wallet < 200:
+            self.price_tolerance = 0.5
+        else:
+            self.price_tolerance = 0.3
+        ratio = cm * ((self.quality_tolerance / self.price_tolerance + user_sentiment) / 2)
+
+        # print('\nratio: ', ratio)
 
         return ratio
 
@@ -65,37 +86,37 @@ class Customer(object):
 
     def purchase_decision(self, product):
 
-        decision = False
         ratio = self.performance_ratio(product)
-        tweets = numpy.asarray(Twitter.get_latest_tweets(product, 100))
-        user_sentiment = 1 if len(tweets) == 0 else (tweets == 'POSITIVE').mean()
-        if user_sentiment >= ratio and ((product not in self.owned_products and random.random() < 0.1) or (
-                product in self.owned_products and random.random() < 0.01)):
-            decision = True
-        if self.wallet < product.price:
-            decision = False
-        elif ratio < 0.8:
-            decision = False
-
-        return decision
+        if 0 < ratio < self.crisp_sets[0]:
+            if random.random() < 0.4:
+                return True
+        if self.crisp_sets[0] < ratio < self.crisp_sets[1]:
+            if random.random() < 0.7:
+                return True
+        if self.crisp_sets[1] < ratio:
+            if random.random() < 0.9:
+                return True
+        else:
+            return False
 
     def consider(self, product):
         # if not enough money in wallet, don't proceed
-        #        if self.wallet < product.price:
-        #            return
-
-        decision = self.purchase_decision(product)
-        if decision == False:
+        if self.wallet < product.price:
+            print('Out of money ' + self.name)
             return
 
+        decision = self.purchase_decision(product)
+        if not decision:
+            return
             # purchase the product from market
+
         seller = Market.buy(self, product)
         if seller != 0:
-            self.dataCenter.data_ranking(obj_data=[self, product, seller], data_type ='customer')
+            self.dataCenter.data_ranking(obj_data=[self, product, seller], data_type='customer')
             self.owned_products.add(product)
 
-        # add product to the owned products list
 
+        # add product to the owned products list
 
     # money is deducted from user's wallet when purchase is completed
     def deduct(self, money):
@@ -113,12 +134,15 @@ class Customer(object):
 
     # one timestep in the simulation world
     def tick(self):
-        self.lock.acquire()
+
 
         # user looks at all the adverts in his ad_space
         for product in self.ad_space:
+            self.lock.acquire()
             self.consider(product)
+            self.lock.release()
 
+        self.lock.acquire()
         # remove the adverts from ad_space
         self.ad_space = set()
 

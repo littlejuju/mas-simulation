@@ -14,17 +14,18 @@ random.seed(seed)
 # create auctioneer 'dataCenter'
 dataCenter = DataCenter('dataCenter')
 # Create some Consumers
-customers = [Customer(name='consumer_' + str(i), customer_id = i, wallet=500, dataCenter=dataCenter,
-                      crisp_sets=(0.3 + 0.2 * (random.random() - 0.5), 0.7 + 0.2 * (random.random() - 0.5)),
-                      price_tolerance=0.5 + 0.4 * random.random(), quality_tolerance=0.5 + 0.4 * random.random()) for i
+customers = [Customer(name='consumer_' + str(i), customer_id=i, wallet=700, dataCenter=dataCenter,
+                      crisp_sets=(0.2 + 0.2 * (random.random() - 0.5), 0.6 + 0.2 * (random.random() - 0.5)),
+                      price_tolerance=0.6 + 0.4 * random.random(), quality_tolerance=0.6 + 0.4 * random.random()) for i
              in range(500)]
 
 # Create a product
 iphone7 = Product(name='iphone7', product_id=0, price=300, quality=0.9, prob_map={'galaxy': [(1, 0.1)]})
 galaxy = Product(name='galaxy', product_id=1, price=200, quality=0.7, prob_map={'iphone7': [(0, 0.2)]})
 iphone5 = Product(name='iphone5', product_id=2, price=220, quality=0.85,
-                 prob_map={'iphone7': [(0, 0.05)], 'galaxy': [(1, 0.02)]})
-note = Product(name='note', product_id=3, price=240, quality=0.88, prob_map={'iphone7': [(0, 0.2)], 'iphone5':[(2, 0.04)], 'galaxy': [(1, 0.3)]})
+                  prob_map={'iphone7': [(0, 0.05)], 'galaxy': [(1, 0.02)]})
+note = Product(name='note', product_id=3, price=240, quality=0.88,
+               prob_map={'iphone7': [(0, 0.2)], 'iphone5': [(2, 0.04)], 'galaxy': [(1, 0.3)]})
 #
 
 # Create a Seller with some budget
@@ -56,7 +57,6 @@ for product in seller_samsung.product_list:
 for consumer in customers:
     consumer.kill()
 
-
 dataCenter.kill()
 price_series = dataCenter.price_series
 sold_series = dataCenter.sold_series
@@ -66,7 +66,8 @@ print(sold_series)
 print(len(sold_series))
 print(customer_history)
 print(len(customer_history))
-iphone_dict = {'price': seller_apple.price_history[iphone7], 'sold': seller_apple.sales_history[iphone7], 'revenue': seller_apple.revenue_history[iphone7]}
+iphone_dict = {'price': seller_apple.price_history[iphone7], 'sold': seller_apple.sales_history[iphone7],
+               'revenue': seller_apple.revenue_history[iphone7]}
 print(iphone_dict)
 # from market import Market
 # correlation_map = Market.correlation_map
