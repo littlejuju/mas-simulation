@@ -95,7 +95,7 @@ class DataCenter(object):
             # update price_series and sold_series
             key = str(obj_data[0].product_id) +'-'+ obj_data[1].name
             self.price_series.loc[obj_data[1].count, key] =  obj_data[1].price_history[obj_data[0]][-1]
-            for item in range(len(obj_data[1].item_sold)):
+            for item in range(obj_data[1].item_sold[obj_data[0]]):
                 self.sold_series[obj_data[1].count].append(key)
         if data_type == 'customer':
             key = obj_data[0].name

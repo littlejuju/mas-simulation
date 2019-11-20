@@ -20,16 +20,17 @@ customers = [Customer(name='consumer_' + str(i), customer_id = i, wallet=500, da
              in range(500)]
 
 # Create a product
-iphone = Product(name='iphone', product_id=0, price=300, quality=0.9, prob_map={'galaxy': [(1, 0.1)]})
-galaxy = Product(name='galaxy', product_id=1, price=200, quality=0.7, prob_map={'iphone': [(0, 0.2)]})
-huawei = Product(name='huawei', product_id=2, price=220, quality=0.85,
-                 prob_map={'iphone': [(0, 0.05)], 'galaxy': [(1, 0.02)]})
+iphone7 = Product(name='iphone7', product_id=0, price=300, quality=0.9, prob_map={'galaxy': [(1, 0.1)]})
+galaxy = Product(name='galaxy', product_id=1, price=200, quality=0.7, prob_map={'iphone7': [(0, 0.2)]})
+iphone5 = Product(name='iphone5', product_id=2, price=220, quality=0.85,
+                 prob_map={'iphone7': [(0, 0.05)], 'galaxy': [(1, 0.02)]})
+note = Product(name='note', product_id=3, price=240, quality=0.88, prob_map={'iphone7': [(0, 0.2)], 'iphone5':[(2, 0.04)], 'galaxy': [(1, 0.3)]})
 #
 
 # Create a Seller with some budget
-seller_apple = Seller(name='apple', product_dict={iphone: 70, huawei: 50}, wallet=1000, dataCenter=dataCenter,
+seller_apple = Seller(name='apple', product_dict={iphone5: 470, iphone7: 450}, wallet=1000, dataCenter=dataCenter,
                       email='a0195470yreceiver@gmail.com')
-seller_samsung = Seller(name='samsung', product_dict={galaxy: 110}, wallet=500, dataCenter=dataCenter,
+seller_samsung = Seller(name='samsung', product_dict={galaxy: 610, note: 200}, wallet=500, dataCenter=dataCenter,
                         email='a0159419u.receiver@gmail.com')
 
 # Wait till the simulation ends
@@ -65,5 +66,7 @@ print(sold_series)
 print(len(sold_series))
 print(customer_history)
 print(len(customer_history))
+iphone_dict = {'price': seller_apple.price_history[iphone7], 'sold': seller_apple.sales_history[iphone7], 'revenue': seller_apple.revenue_history[iphone7]}
+print(iphone_dict)
 # from market import Market
 # correlation_map = Market.correlation_map
