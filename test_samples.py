@@ -42,4 +42,7 @@ price_str = 'product1'
 print(CEO_price_training[price_str])
 CEO_price_training.loc[0] = None
 CEO_price_training.loc[0,(price_str,'price')] = 1
+CEO_price_training.loc[1] = None
+CEO_price_training.loc[1,(price_str,'price')] = 1
 print(CEO_price_training[price_str])
+print(CEO_price_training[price_str].loc[0:2, 'price'])

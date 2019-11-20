@@ -180,6 +180,8 @@ class Seller(object):
             return add_price
         """4. if not cheating"""
         # 4.1 divide training and validation set
+        df_training = self.CEO_price_training[product.name].loc[0:self.count-10]
+        df_validation = self.CEO_price_training[product.name].loc[self.count-10: self.count+1]
 
 
 
