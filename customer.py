@@ -69,7 +69,7 @@ class Customer(object):
                 except KeyError:
                     correlation.append(0.5)
         if len(correlation) > 0:
-            cm = sum(correlation)/len(correlation)
+            cm = 2 * sum(correlation)/len(correlation)
         else:
             cm = 1
         if self.wallet < 200:
@@ -95,7 +95,7 @@ class Customer(object):
             if random.random() < 0.05:
                 return True
         if self.crisp_sets[1] < ratio:
-            if random.random() < 0.15:
+            if random.random() < 0.1:
                 return True
         else:
             return False
