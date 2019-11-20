@@ -2,6 +2,7 @@
 ## 1. customer.py
 ### 1.1 Parameters
 * *name* (str): consumer id
+* ***customer_id*** (int): customer_id
 * *wallet* (float): consumer possession
 * *❌tolerance*
 * ***price_tolerance*** (float [0,1]): higher -> consumer tends to buy higher-price products
@@ -45,6 +46,9 @@
       record sellers price decision for each product in each tick
       key: product
       value: price at this tick
+* ***CEO_price_training*** (DataFrame): training data required in CEO_Price function
+* ***CEO_price_validation*** (DataFrame): validation data required in CEO_price function
+* ***customer_record*** (dict): record what customers each product has been sold to (for customer behavior analysis)
 
 
 ### 3.2 Functions
