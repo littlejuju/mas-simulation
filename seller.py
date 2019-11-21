@@ -55,6 +55,7 @@ class Seller(object):
         self.expense_history = dict()
         self.sentiment_history = dict()
         self.item_sold = dict()
+        self.CEO_price_model = dict()
 
         for product in self.product_list:
             dataframe_index_1.extend([product.name, product.name])
@@ -67,6 +68,7 @@ class Seller(object):
             self.item_sold[product] = 0
             self.price_history[product] = [product.price]
             self.poly2_coef[product] = [0, 0, 0]
+            self.CEO_price_model[product] = {'x':[],'y':[]}
             product.add_seller(self)
             self.dataCenter.register_data(obj_data=[product, self], register_type='seller')
             print(self.dataCenter.price_series)
@@ -132,6 +134,7 @@ class Seller(object):
             print('Expenses in previous quarter:', self.my_expenses(product, True))
             print('Profit in previous quarter:', self.my_profit(product, True))
             print('\nStrategy for next quarter \nAdvert Type: {}, scale: {}\n\n'.format(advert_type, scale))
+            print('\n',self.count)
 
             # avoid bankrupt
             if self.count > 1 and self.revenue_history[product][-1] > 0:
@@ -221,6 +224,13 @@ class Seller(object):
                 add_price = new_price - self.price_history[product][-1]
                 self.poly2_coef[product] = coef[0]
                 self.poly2_coef[product][0] = lin_reg_2.intercept_
+                price_series = np.array(self.price_history[product][1:])
+                price_model = dict()
+                axis_x = np.arange(int(min(price_series)),int(max(price_series))+1).reshape([-1,1])
+                X_poly2 = poly_reg.fit_transform(axis_x)
+                price_model['x'] = axis_x
+                price_model['y'] = [y - lin_reg_2.intercept_ for y in list(lin_reg_2.predict(X_poly2))]
+                self.CEO_price_model[product] = price_model
             else:
                 add_price = 0
         elif 'sgd' in self.CEO_type:
@@ -242,15 +252,22 @@ class Seller(object):
             sgd = SGD(lr=0.3)
             model.compile(optimizer=sgd, loss='mse')
             step_cost = list()
-            for step in range(100):
+            for step in range(20):
                 # one batch each step
                 cost = model.train_on_batch(x_data, y_data)
                 step_cost.append(cost)
-            weight, b = model.layers[0].get_weights()
-            print('W：', weight, ' b: ', b)
+            # weight, b = model.layers[0].get_weights()
+            # print('W：', weight, ' b: ', b)
             print(len(model.layers))
+            self.CEO_price_model[product] = model
             trial_x = np.linspace(min(x_data),0.1,max(x_data))
             y_pred = list(model.predict(trial_x))
+            price_series = np.array(self.price_history[product][1:])
+            price_model = dict()
+            axis_x = np.arange(int(min(price_series)),int(max(price_series))+1).reshape([-1,1])
+            price_model['x'] = axis_x
+            price_model['y'] = model.predict(axis_x)
+            self.CEO_price_model[product] = price_model
             new_price = trial_x[y_pred.index(max(y_pred))]
             add_price = new_price - self.price_history[product][-1]
         return add_price

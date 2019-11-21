@@ -34,7 +34,7 @@ note = Product(name='note', product_id=3, price=240, quality=0.88,
 seller_apple = Seller(name='apple', product_dict={iphone5: 1470, iphone7: 1450}, wallet=1000, dataCenter=dataCenter,
                       email='a0195470yreceiver@gmail.com')
 seller_samsung = Seller(name='samsung', product_dict={galaxy: 1510, note: 1200}, wallet=500, dataCenter=dataCenter,
-                        email='a0159419u.receiver@gmail.com', CEO_type = 'sgd_relu')
+                        email='a0159419u.receiver@gmail.com')
 
 # Wait till the simulation ends
 try:
@@ -74,5 +74,6 @@ print(len(customer_history))
 iphone_dict = {'price': seller_samsung.price_history[note], 'sold': seller_samsung.sales_history[note],
                'revenue': seller_samsung.revenue_history[note]}
 print(iphone_dict)
+print(seller_apple.CEO_price_model[iphone7])
 # from market import Market
 # correlation_map = Market.correlation_map

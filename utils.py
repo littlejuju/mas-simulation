@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.preprocessing import PolynomialFeatures
 
 
 def plot(seller):
@@ -34,20 +35,34 @@ def regression(seller):
     elif seller.CEO_type == 'poly2':
         for product in seller.product_list:
             plt.figure()
+            model = seller.CEO_price_model[product]
             price_series = np.array(seller.price_history[product][1:])
             revenue_series = np.array(seller.revenue_history[product])
             # print(len(price_series))
             # print(len(revenue_series))
-            axis_x = np.arange(int(min(price_series)),int(max(price_series))+1).reshape([-1,1])
-            predict_y = np.array([seller.poly2_coef[product][0] + seller.poly2_coef[product][1] * x + seller.poly2_coef[product][2]*(x**2) for x in axis_x])
+            axis_x = model['x']
+            predict_y = model['y']
             plt.scatter(price_series, revenue_series, color='orange')
             plt.plot(axis_x, predict_y, color='blue')
             plt.xlabel('Price')
             plt.ylabel('Revenue')
             plt.title(seller.name.upper() + ' ' + product.name +
                       ' Regression: ' + str(seller.poly2_coef[product][0]) + ' + ' +
-                      str(seller.poly2_coef[product][1]) + 'x + ' + str(seller.poly2_coef[product][2]) + 'x^2' , size=12)
+                      str(seller.poly2_coef[product][1]) + 'x + ' + str(seller.poly2_coef[product][2]) + 'x^2' , size=6)
 
         plt.show()
-    elif seller.CEO_type == 'sgd':
-        return
+    elif 'sgd' in seller.CEO_type:
+        for product in seller.product_list:
+            plt.figure()
+            model = seller.CEO_price_model[product]
+            price_series = np.array(seller.price_history[product][1:])
+            revenue_series = np.array(seller.revenue_history[product])
+            axis_x = model['x']
+            predict_y = model['y']
+            plt.scatter(price_series, revenue_series, color='orange')
+            plt.plot(axis_x, predict_y, color='blue')
+            plt.xlabel('Price')
+            plt.ylabel('Revenue')
+            plt.title(seller.name.upper() + ' ' + product.name +
+                      ' Regression: ' + seller.CEO_type, size=6)
+        plt.show()
