@@ -50,6 +50,7 @@
 * ***CEO_price_training*** (DataFrame): training data required in CEO_Price function
 * ***CEO_price_validation*** (DataFrame): validation data required in CEO_price function
 * ***customer_record*** (dict): record what customers each product has been sold to (for customer behavior analysis)
+* ***poly2_coef*** (dict): coefficients of 2 degree polynomial regression
 
 
 ### 3.2 Functions

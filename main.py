@@ -5,7 +5,7 @@ from constants import seed
 from customer import Customer
 from product import Product
 from seller import Seller
-from utils import plot
+from utils import plot, regression
 from DataCenter import DataCenter
 from constants import ticks
 
@@ -47,6 +47,9 @@ seller_samsung.kill()
 # Plot the sales and expenditure trends
 plot(seller_apple)
 plot(seller_samsung)
+
+regression(seller_apple)
+regression(seller_samsung)
 
 for product in seller_apple.product_list:
     print('Total Profit Apple ' + product.name + ': ', seller_apple.my_profit(product))

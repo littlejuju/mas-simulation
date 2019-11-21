@@ -29,6 +29,8 @@ class Seller(object):
         dataframe_index_1 = list()
         dataframe_index_2 = list()
         self.customer_record = dict()
+        self.poly2_coef = dict()
+
 
         # register the seller in market
         Market.register_seller(self, self.product_storage)
@@ -55,6 +57,7 @@ class Seller(object):
             self.sentiment_history[product] = list()
             self.item_sold[product] = 0
             self.price_history[product] = [product.price]
+            self.poly2_coef[product] = [0,0,0]
             product.add_seller(self)
             self.dataCenter.register_data(obj_data=[product, self], register_type='seller')
             print(self.dataCenter.price_series)
@@ -204,6 +207,8 @@ class Seller(object):
         if coef[0][2] < 0 and coef[0][1] > 0:
             new_price = -coef[0][1] / (2 * coef[0][2])
             add_price = new_price - self.price_history[product][-1]
+            self.poly2_coef[product] = coef[0]
+            self.poly2_coef[product][0] = lin_reg_2.intercept_
         else:
             add_price = 0
         return add_price
