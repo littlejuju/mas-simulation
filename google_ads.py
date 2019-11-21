@@ -27,7 +27,7 @@ class GoogleAds(object):
 
     # post an advert about the product
     @staticmethod
-    def post_advertisement(seller, product, advert_type, scale, budget):
+    def post_advertisement(seller, product, advert_type, user_list, scale, budget):
         # scale of adverts should not be more than number of users
         scale = min(scale, len(list(set(GoogleAds.users) - set(GoogleAds.purchase_history[product]))))
         GoogleAds.lock.acquire()
@@ -38,8 +38,7 @@ class GoogleAds(object):
 
         # if advert_type is targeted, choose user's who were not shown the same advert in previous tick
         elif advert_type == GoogleAds.ADVERT_TARGETED:
-            new_users = list(set(GoogleAds.users) - set(GoogleAds.purchase_history[product]))
-            users = random.choices(new_users, k=scale)
+            users = user_list
 
         else:
             print('Not a valid Advert type')
