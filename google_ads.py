@@ -51,8 +51,8 @@ class GoogleAds(object):
         bill = scale * GoogleAds.advert_price[advert_type]
 
         # estimate budget and bill
-        if budget != 0 & bill > budget:
-            scale = int(budget/GoogleAds.advert_price[advert_type])
+        if budget != 0 and bill > int(budget):
+            scale = int(budget) // GoogleAds.advert_price[advert_type]
             users = random.choices(users, k=scale)
             bill = scale * GoogleAds.advert_price[advert_type]
 

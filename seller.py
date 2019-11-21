@@ -1,7 +1,7 @@
 import time
 from threading import Lock, Thread
 
-import numpy
+import numpy as np
 
 from constants import tick_time
 from constants import ad_budget_ration
@@ -122,34 +122,35 @@ class Seller(object):
             print('\nStrategy for next quarter \nAdvert Type: {}, scale: {}\n\n'.format(advert_type, scale))
 
             # avoid bankrupt
-            if self.count > 1 & self.my_revenue(product, True) > 0:
-                budget = ad_budget_ration * self.my_revenue(product, True)
+            if self.count > 1 and self.revenue_history[product][-1] > 0:
+                budget = ad_budget_ration * self.revenue_history[product][-1]
             else:
                 budget = 0
                 # perform the actions and view the expense
             if self.product_storage[product] > 0:
-                self.expense_history[product].append(GoogleAds.post_advertisement(self, product, advert_type, scale, budget))
+                self.expense_history[product].append(
+                    GoogleAds.post_advertisement(self, product, advert_type, scale, budget))
             else:
                 self.expense_history[product].append(0)
 
     # calculates the total revenue. Gives the revenue in last tick if latest_only = True
     def my_revenue(self, product, latest_only=False):
-        revenue = self.revenue_history[product][-1] if latest_only else numpy.sum(self.revenue_history[product])
+        revenue = self.revenue_history[product][-1] if latest_only else np.sum(self.revenue_history[product])
         return revenue
 
     # calculates the total revenue. Gives the revenue in last tick if latest_only = True
     def my_expenses(self, product, latest_only=False):
-        bill = self.expense_history[product][-1] if latest_only else numpy.sum(self.expense_history[product])
+        bill = self.expense_history[product][-1] if latest_only else np.sum(self.expense_history[product])
         return bill
 
     # calculates the total revenue. Gives the revenue in last tick if latest_only = True
     def my_profit(self, product, latest_only=False):
-        profit = self.profit_history[product][-1] if latest_only else numpy.sum(self.profit_history[product])
+        profit = self.profit_history[product][-1] if latest_only else np.sum(self.profit_history[product])
         return profit
 
     # calculates the user sentiment from tweets.
     def user_sentiment(self, product):
-        tweets = numpy.asarray(Twitter.get_latest_tweets(product, 100))
+        tweets = np.asarray(Twitter.get_latest_tweets(product, 100))
         return 1 if len(tweets) == 0 else (tweets == 'POSITIVE').mean()
 
     # to stop the seller thread
@@ -165,8 +166,8 @@ class Seller(object):
 
     def CEO_price(self, product):
         """1. record price and revenue into training data set"""
-        self.CEO_price_training.loc[self.count, (product.name,'price')] = self.price_history[product][-1]
-        self.CEO_price_training.loc[self.count, (product.name,'revenue')] = self.revenue_history[product][-1]
+        self.CEO_price_training.loc[self.count, (product.name, 'price')] = self.price_history[product][-1]
+        self.CEO_price_training.loc[self.count, (product.name, 'revenue')] = self.revenue_history[product][-1]
         """2. if count < 30: prepare for training data and return random add_price for trial runs"""
         if self.count < 30:
             add_price = int(10 * (random.random() - 0.5))
@@ -182,12 +183,29 @@ class Seller(object):
             return add_price
         """4. if not cheating"""
         # 4.1 divide training and validation set
-        df_training = self.CEO_price_training[product.name].loc[0:self.count-10]
-        df_validation = self.CEO_price_training[product.name].loc[self.count-10: self.count+1]
-
-
-
-        add_price = 0
+        df_training = self.CEO_price_training[product.name].loc[0:self.count - 10]
+        df_validation = self.CEO_price_training[product.name].loc[self.count - 10: self.count + 1]
+        # 4.2 2 degree polynomial regression
+        poly_reg = PolynomialFeatures(degree=2)
+        X_poly = poly_reg.fit_transform(np.array(df_training['price'].values).reshape(-1, 1))
+        lin_reg_2 = linear_model.LinearRegression()
+        lin_reg_2.fit(X_poly, np.array(df_training['revenue'].values).reshape(-1, 1))
+        coef = lin_reg_2.coef_
+        # calculate mse
+        score = np.mean((lin_reg_2.predict(X_poly) - np.array(df_training['revenue'].values)) ** 2)
+        # calculate R square
+        SSR = sum([(f_i - np.mean(np.array(df_training['revenue'].values))) ** 2 for f_i in lin_reg_2.predict(X_poly)])
+        SST = sum([(y_i - np.mean(np.array(df_training['revenue'].values))) ** 2 for y_i in df_training['revenue'].values.tolist()])
+        R_square = SSR / SST
+        #lin_reg_2.score(np.array(df_validation['price'].values), np.array(df_validation['revenue'].values).reshape(-1, 1))
+        print('\nRegression Coefficient ' + product.name + ' :' + str(coef))
+        print('\nRegression MSE Score ' + product.name + ' :' + str(score))
+        print('\nRegression R Square ' + product.name + ' :' + str(R_square))
+        if coef[0][2] < 0 and coef[0][1] > 0:
+            new_price = -coef[0][1] / (2 * coef[0][2])
+            add_price = new_price - self.price_history[product][-1]
+        else:
+            add_price = 0
         return add_price
 
     """ Cognition system that make decisions about advertisement."""

@@ -17,7 +17,7 @@ dataCenter = DataCenter('dataCenter')
 customers = [Customer(name='consumer_' + str(i), customer_id=i, wallet=7000, dataCenter=dataCenter,
                       crisp_sets=(0.3 + 0.2 * (random.random() - 0.5), 0.7 + 0.2 * (random.random() - 0.5)),
                       price_tolerance=0.5 + 0.4 * random.random(), quality_tolerance=0.5 + 0.4 * random.random()) for i
-             in range(500)]
+             in range(700)]
 
 # Create a product
 iphone7 = Product(name='iphone7', product_id=0, price=300, quality=0.9, prob_map={'galaxy': [(1, 0.6)]})
@@ -29,9 +29,9 @@ note = Product(name='note', product_id=3, price=240, quality=0.88,
 #
 
 # Create a Seller with some budget
-seller_apple = Seller(name='apple', product_dict={iphone5: 470, iphone7: 450}, wallet=1000, dataCenter=dataCenter,
+seller_apple = Seller(name='apple', product_dict={iphone5: 1470, iphone7: 1450}, wallet=1000, dataCenter=dataCenter,
                       email='a0195470yreceiver@gmail.com')
-seller_samsung = Seller(name='samsung', product_dict={galaxy: 610, note: 200}, wallet=500, dataCenter=dataCenter,
+seller_samsung = Seller(name='samsung', product_dict={galaxy: 1510, note: 1200}, wallet=500, dataCenter=dataCenter,
                         email='a0159419u.receiver@gmail.com')
 
 # Wait till the simulation ends
@@ -66,8 +66,8 @@ print(sold_series)
 print(len(sold_series))
 print(customer_history)
 print(len(customer_history))
-iphone_dict = {'price': seller_apple.price_history[iphone7], 'sold': seller_apple.sales_history[iphone7],
-               'revenue': seller_apple.revenue_history[iphone7]}
+iphone_dict = {'price': seller_samsung.price_history[note], 'sold': seller_samsung.sales_history[note],
+               'revenue': seller_samsung.revenue_history[note]}
 print(iphone_dict)
 # from market import Market
 # correlation_map = Market.correlation_map

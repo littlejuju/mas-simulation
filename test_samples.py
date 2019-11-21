@@ -46,3 +46,8 @@ CEO_price_training.loc[1] = None
 CEO_price_training.loc[1,(price_str,'price')] = 1
 print(CEO_price_training[price_str])
 print(CEO_price_training[price_str].loc[0:2, 'price'])
+
+import numpy as np
+df_training = CEO_price_training[price_str]
+dataset_x = np.array(df_training['price'].values)
+print(dataset_x)
