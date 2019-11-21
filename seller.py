@@ -13,13 +13,20 @@ import random
 import pandas as pd
 from sklearn import linear_model
 from sklearn.preprocessing import PolynomialFeatures
+from keras.models import Sequential
+# Dense full connect layer
+from keras.layers import Dense, Activation
+# optimizer: Stochastic gradient descent
+from keras.optimizers import SGD
+
 
 
 class Seller(object):
 
-    def __init__(self, name, product_dict, wallet, dataCenter, email='zhuxiangqi314@gmail.com'):
+    def __init__(self, name, product_dict, wallet, dataCenter, email='zhuxiangqi314@gmail.com', CEO_type = 'poly2'):
         self.count = 0
         self.name = name
+        self.CEO_type = CEO_type
         self.product_storage = product_dict
         self.product_list = [product for product in product_dict]
         #        self.product = product_list
@@ -186,30 +193,35 @@ class Seller(object):
             return add_price
         """4. if not cheating"""
         # 4.1 divide training and validation set
-        df_training = self.CEO_price_training[product.name].loc[0:self.count - 10]
-        df_validation = self.CEO_price_training[product.name].loc[self.count - 10: self.count + 1]
-        # 4.2 2 degree polynomial regression
-        poly_reg = PolynomialFeatures(degree=2)
-        X_poly = poly_reg.fit_transform(np.array(df_training['price'].values).reshape(-1, 1))
-        lin_reg_2 = linear_model.LinearRegression()
-        lin_reg_2.fit(X_poly, np.array(df_training['revenue'].values).reshape(-1, 1))
-        coef = lin_reg_2.coef_
-        # calculate mse
-        score = np.mean((lin_reg_2.predict(X_poly) - np.array(df_training['revenue'].values)) ** 2)
-        # calculate R square
-        SSR = sum([(f_i - np.mean(np.array(df_training['revenue'].values))) ** 2 for f_i in lin_reg_2.predict(X_poly)])
-        SST = sum([(y_i - np.mean(np.array(df_training['revenue'].values))) ** 2 for y_i in df_training['revenue'].values.tolist()])
-        R_square = SSR / SST
-        #lin_reg_2.score(np.array(df_validation['price'].values), np.array(df_validation['revenue'].values).reshape(-1, 1))
-        print('\nRegression Coefficient ' + product.name + ' :' + str(coef))
-        print('\nRegression MSE Score ' + product.name + ' :' + str(score))
-        print('\nRegression R Square ' + product.name + ' :' + str(R_square))
-        if coef[0][2] < 0 and coef[0][1] > 0:
-            new_price = -coef[0][1] / (2 * coef[0][2])
-            add_price = new_price - self.price_history[product][-1]
-            self.poly2_coef[product] = coef[0]
-            self.poly2_coef[product][0] = lin_reg_2.intercept_
-        else:
+        if self.CEO_type == 'random':
+            add_price = int(10 * (random.random() - 0.5))
+        elif self.CEO_type == 'poly2':
+            df_training = self.CEO_price_training[product.name].loc[0:self.count - 10]
+            df_validation = self.CEO_price_training[product.name].loc[self.count - 10: self.count + 1]
+            # 4.2 2 degree polynomial regression
+            poly_reg = PolynomialFeatures(degree=2)
+            X_poly = poly_reg.fit_transform(np.array(df_training['price'].values).reshape(-1, 1))
+            lin_reg_2 = linear_model.LinearRegression()
+            lin_reg_2.fit(X_poly, np.array(df_training['revenue'].values).reshape(-1, 1))
+            coef = lin_reg_2.coef_
+            # calculate mse
+            score = np.mean((lin_reg_2.predict(X_poly) - np.array(df_training['revenue'].values)) ** 2)
+            # calculate R square
+            SSR = sum([(f_i - np.mean(np.array(df_training['revenue'].values))) ** 2 for f_i in lin_reg_2.predict(X_poly)])
+            SST = sum([(y_i - np.mean(np.array(df_training['revenue'].values))) ** 2 for y_i in df_training['revenue'].values.tolist()])
+            R_square = SSR / SST
+            #lin_reg_2.score(np.array(df_validation['price'].values), np.array(df_validation['revenue'].values).reshape(-1, 1))
+            print('\nRegression Coefficient ' + product.name + ' :' + str(coef))
+            print('\nRegression MSE Score ' + product.name + ' :' + str(score))
+            print('\nRegression R Square ' + product.name + ' :' + str(R_square))
+            if coef[0][2] < 0 and coef[0][1] > 0:
+                new_price = -coef[0][1] / (2 * coef[0][2])
+                add_price = new_price - self.price_history[product][-1]
+                self.poly2_coef[product] = coef[0]
+                self.poly2_coef[product][0] = lin_reg_2.intercept_
+            else:
+                add_price = 0
+        elif self.CEO_type == 'sgd':
             add_price = 0
         return add_price
 
