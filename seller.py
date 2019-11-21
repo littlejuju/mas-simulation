@@ -2,6 +2,8 @@ import time
 from threading import Lock, Thread
 
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
 from constants import tick_time
 from constants import ad_budget_ration
@@ -221,8 +223,36 @@ class Seller(object):
                 self.poly2_coef[product][0] = lin_reg_2.intercept_
             else:
                 add_price = 0
-        elif self.CEO_type == 'sgd':
-            add_price = 0
+        elif 'sgd' in self.CEO_type:
+            df_training = self.CEO_price_training[product.name].loc[0:self.count + 1]
+            x_data = np.array(df_training['price'].values)
+            y_data = np.array(df_training['revenue'].values)
+            model = Sequential()
+            # activate function: tanh
+            if self.CEO_type == 'sgd_tanh':
+                model.add(Dense(units=10, input_dim=1))
+                model.add(Activation('tanh'))
+                model.add(Dense(units=1))
+                model.add(Activation('tanh'))
+            elif self.CEO_type == 'sgd_relu':
+                model.add(Dense(units=10, input_dim=1))
+                model.add(Activation('relu'))
+                model.add(Dense(units=1))
+                model.add(Activation('relu'))
+            sgd = SGD(lr=0.3)
+            model.compile(optimizer=sgd, loss='mse')
+            step_cost = list()
+            for step in range(100):
+                # one batch each step
+                cost = model.train_on_batch(x_data, y_data)
+                step_cost.append(cost)
+            weight, b = model.layers[0].get_weights()
+            print('W：', weight, ' b: ', b)
+            print(len(model.layers))
+            trial_x = np.linspace(min(x_data),0.1,max(x_data))
+            y_pred = list(model.predict(trial_x))
+            new_price = trial_x[y_pred.index(max(y_pred))]
+            add_price = new_price - self.price_history[product][-1]
         return add_price
 
     """ Cognition system that make decisions about advertisement."""

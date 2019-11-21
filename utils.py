@@ -29,20 +29,25 @@ def plot(seller):
     plt.show()
 
 def regression(seller):
-    for product in seller.product_list:
-        plt.figure()
-        price_series = np.array(seller.price_history[product][1:])
-        revenue_series = np.array(seller.revenue_history[product])
-        # print(len(price_series))
-        # print(len(revenue_series))
-        axis_x = np.arange(int(min(price_series)),int(max(price_series))+1).reshape([-1,1])
-        predict_y = np.array([seller.poly2_coef[product][0] + seller.poly2_coef[product][1] * x + seller.poly2_coef[product][2]*(x**2) for x in axis_x])
-        plt.scatter(price_series, revenue_series, color='orange')
-        plt.plot(axis_x, predict_y, color='blue')
-        plt.xlabel('Price')
-        plt.ylabel('Revenue')
-        plt.title(seller.name.upper() + ' ' + product.name +
-                  ' Regression: ' + str(seller.poly2_coef[product][0]) + ' + ' +
-                  str(seller.poly2_coef[product][1]) + 'x + ' + str(seller.poly2_coef[product][2]) + 'x^2' , size=12)
+    if seller.CEO_type == 'random':
+        return
+    elif seller.CEO_type == 'poly2':
+        for product in seller.product_list:
+            plt.figure()
+            price_series = np.array(seller.price_history[product][1:])
+            revenue_series = np.array(seller.revenue_history[product])
+            # print(len(price_series))
+            # print(len(revenue_series))
+            axis_x = np.arange(int(min(price_series)),int(max(price_series))+1).reshape([-1,1])
+            predict_y = np.array([seller.poly2_coef[product][0] + seller.poly2_coef[product][1] * x + seller.poly2_coef[product][2]*(x**2) for x in axis_x])
+            plt.scatter(price_series, revenue_series, color='orange')
+            plt.plot(axis_x, predict_y, color='blue')
+            plt.xlabel('Price')
+            plt.ylabel('Revenue')
+            plt.title(seller.name.upper() + ' ' + product.name +
+                      ' Regression: ' + str(seller.poly2_coef[product][0]) + ' + ' +
+                      str(seller.poly2_coef[product][1]) + 'x + ' + str(seller.poly2_coef[product][2]) + 'x^2' , size=12)
 
-    plt.show()
+        plt.show()
+    elif seller.CEO_type == 'sgd':
+        return

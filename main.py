@@ -8,6 +8,8 @@ from seller import Seller
 from utils import plot, regression
 from DataCenter import DataCenter
 from constants import ticks
+import warnings
+warnings.filterwarnings('ignore')
 
 random.seed(seed)
 
@@ -32,7 +34,7 @@ note = Product(name='note', product_id=3, price=240, quality=0.88,
 seller_apple = Seller(name='apple', product_dict={iphone5: 1470, iphone7: 1450}, wallet=1000, dataCenter=dataCenter,
                       email='a0195470yreceiver@gmail.com')
 seller_samsung = Seller(name='samsung', product_dict={galaxy: 1510, note: 1200}, wallet=500, dataCenter=dataCenter,
-                        email='a0159419u.receiver@gmail.com')
+                        email='a0159419u.receiver@gmail.com', CEO_type = 'sgd_relu')
 
 # Wait till the simulation ends
 try:
