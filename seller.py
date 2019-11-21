@@ -5,6 +5,7 @@ import numpy as np
 
 from constants import tick_time
 from constants import ad_budget_ration
+from constants import relevance_to_recommend
 from google_ads import GoogleAds
 from market import Market
 from twitter import Twitter
@@ -230,10 +231,10 @@ class Seller(object):
                     if relevance > most_relevance:
                         most_relevance = relevance
                         most_relevant_user_list = GoogleAds.purchase_history[other_product]
-        if most_relevance < 0.3:
-            advert_type = GoogleAds.ADVERT_BASIC
-            scale = self.wallet // GoogleAds.advert_price[advert_type]
-        else:
+        if most_relevance > relevance_to_recommend:
             advert_type = GoogleAds.ADVERT_TARGETED
             scale = len(most_relevant_user_list)
+        else:
+            advert_type = GoogleAds.ADVERT_BASIC
+            scale = self.wallet // GoogleAds.advert_price[advert_type]
         return advert_type, most_relevant_user_list, scale
