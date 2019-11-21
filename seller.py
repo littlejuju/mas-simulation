@@ -258,10 +258,12 @@ class Seller(object):
     """ Cognition system that make decisions about advertisement."""
 
     def CEO_advertisement(self, product):
-        # WRITE YOUR INTELLIGENT CODE HERE
-        # Recommendation algorithm based on relationship between two products:
-        # if users bought a product which has strong connection with other product,
-        # these users will be targeted for the other product.
+        """
+        WRITE YOUR INTELLIGENT CODE HERE
+        Recommendation algorithm based on relationship between two products:
+        if users bought a product which has strong connection with other product,
+        these users will be targeted for the other product.
+        """
         most_relevance = 0
         most_relevant_user_list = GoogleAds.purchase_history[product]
         for other_product in self.product_list:
