@@ -7,6 +7,7 @@ warnings.filterwarnings('ignore')
 
 from constants import tick_time
 from constants import ad_budget_ration
+from constants import relevance_to_recommend
 from google_ads import GoogleAds
 from market import Market
 from twitter import Twitter
@@ -40,7 +41,6 @@ class Seller(object):
         self.customer_record = dict()
         self.poly2_coef = dict()
 
-
         # register the seller in market
         Market.register_seller(self, self.product_storage)
 
@@ -66,7 +66,7 @@ class Seller(object):
             self.sentiment_history[product] = list()
             self.item_sold[product] = 0
             self.price_history[product] = [product.price]
-            self.poly2_coef[product] = [0,0,0]
+            self.poly2_coef[product] = [0, 0, 0]
             product.add_seller(self)
             self.dataCenter.register_data(obj_data=[product, self], register_type='seller')
             print(self.dataCenter.price_series)
@@ -124,7 +124,7 @@ class Seller(object):
 
             # choose what to do for next timestep
 
-            advert_type, scale = self.CEO_advertisement(product)
+            advert_type, user_list, scale = self.CEO_advertisement(product)
 
             # ANSWER a. print data to show progress
             print('\nProduct in previous quarter: ' + product.name)
@@ -141,7 +141,7 @@ class Seller(object):
                 # perform the actions and view the expense
             if self.product_storage[product] > 0:
                 self.expense_history[product].append(
-                    GoogleAds.post_advertisement(self, product, advert_type, scale, budget))
+                    GoogleAds.post_advertisement(self, product, advert_type, user_list, scale, budget))
             else:
                 self.expense_history[product].append(0)
 
@@ -259,15 +259,23 @@ class Seller(object):
 
     def CEO_advertisement(self, product):
         # WRITE YOUR INTELLIGENT CODE HERE
-        # You can use following functions to make decision
-        #   my_revenue
-        #   my_expenses
-        #   my_profit
-        #   user_sentiment
-        #
-        # You need to return the type of advert you want to publish and at what scale
-        # GoogleAds.advert_price[advert_type] gives you the rate of an advert
-
-        advert_type = GoogleAds.ADVERT_BASIC if GoogleAds.user_coverage(product) < 0.5 else GoogleAds.ADVERT_TARGETED
-        scale = self.wallet // GoogleAds.advert_price[advert_type] // 2  # not spending everything
-        return advert_type, scale
+        # Recommendation algorithm based on relationship between two products:
+        # if users bought a product which has strong connection with other product,
+        # these users will be targeted for the other product.
+        most_relevance = 0
+        most_relevant_user_list = GoogleAds.purchase_history[product]
+        for other_product in self.product_list:
+            if product.name != other_product.name:
+                if len(GoogleAds.purchase_history[other_product]) > 0:
+                    relevance = len(list(set(GoogleAds.purchase_history[product]) & set(
+                        GoogleAds.purchase_history[other_product]))) / len(GoogleAds.purchase_history[other_product])
+                    if relevance > most_relevance:
+                        most_relevance = relevance
+                        most_relevant_user_list = GoogleAds.purchase_history[other_product]
+        if most_relevance > relevance_to_recommend:
+            advert_type = GoogleAds.ADVERT_TARGETED
+            scale = len(most_relevant_user_list)
+        else:
+            advert_type = GoogleAds.ADVERT_BASIC
+            scale = self.wallet // GoogleAds.advert_price[advert_type]
+        return advert_type, most_relevant_user_list, scale
