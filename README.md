@@ -103,6 +103,8 @@
       record customer purchasing record
       key: customer_name
       value: list of tuples: (purchased format('product-seller'), price)
+* ***sales_rank*** (dataframe)
+      record sales rank in each tick
 
 ### 5.2 Functions
 * ***seller_info_update(count, update_type = True)*** (void):

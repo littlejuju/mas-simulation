@@ -46,6 +46,7 @@ CEO_price_training.loc[1] = None
 CEO_price_training.loc[1,(price_str,'price')] = 1
 print(CEO_price_training[price_str])
 print(CEO_price_training[price_str].loc[0:2, 'price'])
+print(CEO_price_training[price_str].loc[:,['price', 'revenue']])
 
 import numpy as np
 df_training = CEO_price_training[price_str]
@@ -123,3 +124,5 @@ plt.show()
 #    1.6485813   0.02880438  0.05999178  0.2506774 ]]  b:  [-0.3891211  -0.27747348 -0.0352951   0.1672752   0.04472595  0.08710503
 #   0.730751    0.21009925 -0.1056181   0.17212172]
 # 4
+test_list = [0,0,2,2,1,3,5]
+print(test_list.count(4))

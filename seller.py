@@ -189,22 +189,25 @@ class Seller(object):
         self.CEO_price_training.loc[self.count, (product.name, 'price')] = self.price_history[product][-1]
         self.CEO_price_training.loc[self.count, (product.name, 'revenue')] = self.revenue_history[product][-1]
         """2. if count < 30: prepare for training data and return random add_price for trial runs"""
-        if self.count < 30:
+        if self.count < 20:
             add_price = int(10 * (random.random() - 0.5))
             return add_price
         """2. decide whether to buy cheating data sheets
             alt1: this product should not be monopolized by this seller"""
         data_cheating = False
         if random.random() > 0.7 and len(product.seller) > 1:
-            self.dataCenter.send_data(self)
+
             data_cheating = True
         """3. if cheating"""
         if data_cheating:
+            """ the aim of cheating from data center is to analyze factors of revenue and """
             """3.1 obtain cheating data sheet """
+            self.dataCenter.send_data(self)
             cheating_sheet_package = self.dataCenter.send_data(self)
             """3.2 price comparison"""
-            seller_list = [seller.name for seller in product.seller]
-            df_product_price = cheating_sheet_package
+            seller_list = [str(product.product_id) + '-' + seller.name for seller in product.seller]
+            df_product_price = cheating_sheet_package['price'].loc[:, seller_list]
+            sold_list = cheating_sheet_package['sold']
             add_price = 0
             return add_price
         """4. if not cheating"""

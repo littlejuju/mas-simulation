@@ -5,6 +5,7 @@ Created on Sat Nov 16 11:36:57 2019
 @author: Xiangqi
 """
 import pandas as pd
+import numpy as np
 from threading import Thread, Lock
 import time
 from constants import tick_time, ticks
@@ -24,7 +25,7 @@ class DataCenter(object):
         
         """2. sold_series: record sold product seller each tick
         list of lists [format('product-seller')]"""
-        self.sold_series = [list() for i in range(ticks + 2)]
+        self.sold_series = [list() for i in range(ticks // tick_time + 2)]
 
         # """3. sold_series_sublist
         # item in sold_series for each tick"""
@@ -34,6 +35,10 @@ class DataCenter(object):
         key: customer_name
         value: list of tuples: (purchased format('product-seller'), wallet)"""
         self.customer_history = dict()
+
+        """5. sales_rank
+        sales rank in each tick"""
+        self.sales_rank = pd.DataFrame()
         self.thread = Thread(name = self.name, target=self.loop)
         self.thread.start()
     
@@ -67,6 +72,7 @@ class DataCenter(object):
             key = str(obj_data[0].product_id) +'-'+ obj_data[1].name
             # initialize price_series
             self.price_series[key] = None
+            self.sales_rank[key] = None
             # sold_series do not need initializing
         if register_type == 'customer':
             key = obj_data.name
@@ -109,9 +115,22 @@ class DataCenter(object):
 #    @staticmethod
     def send_data(self, seller):
         self.lock.acquire()
+        sales_rank = self.sales_rank
+        df_index = 0
+        for sales_index in range(len(self.sold_series) - 1):
+            sales_list = self.sold_series[sales_index + 1]
+            key_list = sales_rank.columns.tolist()
+            sales_count = [sales_list.count(key) for key in key_list]
+            sales_sorted = np.argsort(np.array(sales_count))
+            rank = len(key_list)
+            for item in sales_sorted:
+                sales_rank.loc[df_index, key_list[item]] = rank
+                rank -= 1
+            df_index += 1
+        self.sales_rank = sales_rank
         cheating_package = dict()
         cheating_package['price'] = self.price_series
-        cheating_package['sold'] = self.sold_series
+        cheating_package['sold'] = self.sales_rank
         cheating_package['customer'] = self.customer_history
         # record all data to google sheet
         # generate an email including all data and send it.
