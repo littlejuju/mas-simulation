@@ -47,6 +47,8 @@ CEO_price_training.loc[1,(price_str,'price')] = 1
 print(CEO_price_training[price_str])
 print(CEO_price_training[price_str].loc[0:2, 'price'])
 print(CEO_price_training[price_str].loc[:,['price', 'revenue']])
+print(CEO_price_training[price_str].iloc[-1].tolist())
+print(CEO_price_training[price_str].iloc[-1].tolist())
 
 import numpy as np
 df_training = CEO_price_training[price_str]

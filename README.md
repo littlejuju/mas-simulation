@@ -57,7 +57,8 @@
 * ***CEO_price_validation*** (DataFrame): validation data required in CEO_price function
 * ***customer_record*** (dict): record what customers each product has been sold to (for customer behavior analysis)
 * ***poly2_coef*** (dict): coefficients of 2 degree polynomial regression
-
+* ***data_cheating*** (bool): decide whether to buy cheating data sheets in each tick
+* ***cheating_package*** (dict): store data sent from data center through data cheating
 
 ### 3.2 Functions
       in each tick, each product will be considered iteratively
@@ -69,6 +70,11 @@
       1. decide whether to buy cheating data from autioneer
       2. analyze data to decide add_price (can be negative)
       3. history return price addition
+* ***CEO_customer_analysis***:
+      Using customer purchasing history to analyze correlation between product
+* ***CEO_price comparison***:
+      if this product has more than one seller, CEO will compare price and sales rank of this product in different sellers.
+      
 
 ## 4. market.py
 ### 4.1 Variables
@@ -103,7 +109,7 @@
       record customer purchasing record
       key: customer_name
       value: list of tuples: (purchased format('product-seller'), price)
-* ***sales_rank*** (dataframe)
+* ***sales_rank*** (pd.Dataframe)
       record sales rank in each tick
 
 ### 5.2 Functions

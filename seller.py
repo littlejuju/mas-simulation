@@ -41,6 +41,8 @@ class Seller(object):
         dataframe_index_2 = list()
         self.customer_record = dict()
         self.poly2_coef = dict()
+        self.data_cheating = False
+        self.cheating_package = dict()
 
         # register the seller in market
         Market.register_seller(self, self.product_storage)
@@ -104,6 +106,16 @@ class Seller(object):
         """ in each tick, each product will be considered iteratively 
         while in CEO decsion function, all products will be considered in each decsion"""
         self.dataCenter.seller_info_update(self.count)
+        """ decide whether to buy cheating data sheets in each tick count > 20 """
+        self.data_cheating = False
+        if self.count > 20 and random.random() > 0.7:
+            self.data_cheating = True
+            """obtain cheating data sheet """
+            self.dataCenter.send_data(self)
+            # the price of a cheating package is related to package size
+            self.wallet -= 20*self.count
+            self.cheating_package = self.dataCenter.send_data(self)
+
         for product in self.product_list:
             self.lock.acquire()
 
@@ -115,9 +127,11 @@ class Seller(object):
             # reset the sales counter
             self.item_sold[product] = 0
 
+
             # Calculate the metrics for previous tick and add to tracker
             self.revenue_history[product].append(self.sales_history[product][-1] * self.price_history[product][-1])
             self.profit_history[product].append(self.revenue_history[product][-1] - self.expense_history[product][-1])
+            self.wallet += self.profit_history[product][-1]
             self.sentiment_history[product].append(self.user_sentiment(product))
             self.price_history[product].append(self.price_history[product][-1] + self.CEO_price(product))
 
@@ -148,6 +162,7 @@ class Seller(object):
                     GoogleAds.post_advertisement(self, product, advert_type, user_list, scale, budget))
             else:
                 self.expense_history[product].append(0)
+        print(self.name + ' wallet: ' + str(self.wallet))
 
     # calculates the total revenue. Gives the revenue in last tick if latest_only = True
     def my_revenue(self, product, latest_only=False):
@@ -177,12 +192,38 @@ class Seller(object):
     def __str__(self):
         return self.name
 
+    """function01 customer analysis
+    Using customer purchasing history to analyze correlation between product
+    if there is product_x 
+     if customer purchase it, they have high prob to buy this product and this product sales rank go lower
+      then add_price -= 1
+     else:
+      add_price += 1"""
+
+    def CEO_customer_analysis(self, product, sales_rank, customer_history):
+        add_add_price = 0
+        return add_add_price
+
+    """function02 price comparison
+    compare price and sales rank of this product in different sellers
+    if product sales rank is the highest, add_add_price = 1
+    else: if other seller has higher sales rank and lower price, add_add_price = -1"""
+    def CEO_price_comparison(self, product, sales_rank, price_history):
+        add_add_price = 0
+        seller_list = [str(product.product_id) + '-' + seller.name for seller in product.seller]
+        df_sales = sales_rank.loc[:, seller_list]
+        df_price = price_history.loc[:, seller_list]
+        this_seller_product = str(product.product_id)+'-'+self.name
+        rank_list = df_sales.iloc[-1].tolist()
+        price_list = df_price.iloc[-1].tolist()
+        if df_sales[this_seller_product].iloc[-1] == min(rank_list):
+            add_add_price += 1
+        elif price_list[rank_list.index(min(rank_list))] == min(price_list):
+            add_add_price -= 1
+        return add_add_price
+
     """function1 price decision
     return price addition (can be negative)"""
-
-    def CEO_customer_analysis(self, product):
-        add_price = 0
-        return add_price
 
     def CEO_price(self, product):
         """1. record price and revenue into training data set"""
@@ -192,24 +233,24 @@ class Seller(object):
         if self.count < 20:
             add_price = int(10 * (random.random() - 0.5))
             return add_price
-        """2. decide whether to buy cheating data sheets
-            alt1: this product should not be monopolized by this seller"""
-        data_cheating = False
-        if random.random() > 0.7 and len(product.seller) > 1:
 
-            data_cheating = True
-        """3. if cheating"""
-        if data_cheating:
+        """3. if cheating
+           add_add_price will be added on add_price (derive by price optimization)"""
+        add_add_price = 0
+        if self.data_cheating:
             """ the aim of cheating from data center is to analyze factors of revenue and """
-            """3.1 obtain cheating data sheet """
-            self.dataCenter.send_data(self)
-            cheating_sheet_package = self.dataCenter.send_data(self)
-            """3.2 price comparison"""
-            seller_list = [str(product.product_id) + '-' + seller.name for seller in product.seller]
-            df_product_price = cheating_sheet_package['price'].loc[:, seller_list]
-            sold_list = cheating_sheet_package['sold']
-            add_price = 0
-            return add_price
+            """3.1 price comparison (if product has more than one seller)"""
+
+            df_sales_rank = self.cheating_package['sold']
+            df_product_price = self.cheating_package['price']
+            if len(product.seller) > 0:
+                add_add_price += self.CEO_price_comparison(product, df_sales_rank, df_product_price)
+
+            """3.2 customer analysis"""
+            dict_customer = self.cheating_package['customer']
+            add_add_price += self.CEO_customer_analysis(product, df_sales_rank, dict_customer)
+
+            # return add_price
         """4. if not cheating"""
         # 4.1 divide training and validation set
         if self.CEO_type == 'random':
@@ -284,7 +325,7 @@ class Seller(object):
             self.CEO_price_model[product] = price_model
             new_price = trial_x[y_pred.index(max(y_pred))]
             add_price = new_price - self.price_history[product][-1]
-        return add_price
+        return add_price + add_add_price
 
     """ Cognition system that make decisions about advertisement."""
 
