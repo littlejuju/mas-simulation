@@ -28,12 +28,13 @@ iphone5 = Product(name='iphone5', product_id=2, price=220, quality=0.85,
                   prob_map={'iphone7': [(0, 0.7)], 'galaxy': [(1, 0.8)]})
 note = Product(name='note', product_id=3, price=240, quality=0.88,
                prob_map={'iphone7': [(0, 0.7)], 'iphone5': [(2, 0.5)], 'galaxy': [(1, 0.6)]})
+headphone = Product(name='headphone', product_id=4, price=80, quality=0.85, prob_map={'iphone7': [(0, 0.9)], 'galaxy': [(1, 0.9)], 'iphone5': [(2, 0.9)], 'note': [(3, 0.9)]})
 #
 
 # Create a Seller with some budget
-seller_apple = Seller(name='apple', product_dict={iphone5: 1470, iphone7: 1450}, wallet=1000, dataCenter=dataCenter,
+seller_apple = Seller(name='apple', product_dict={iphone5: 1470, iphone7: 1450, headphone: 2000}, wallet=1000, dataCenter=dataCenter,
                       email='a0195470yreceiver@gmail.com')
-seller_samsung = Seller(name='samsung', product_dict={galaxy: 1510, note: 1200}, wallet=500, dataCenter=dataCenter,
+seller_samsung = Seller(name='samsung', product_dict={galaxy: 1510, note: 1200, headphone: 2000}, wallet=500, dataCenter=dataCenter,
                         email='a0159419u.receiver@gmail.com')
 
 # Wait till the simulation ends

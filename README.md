@@ -47,6 +47,12 @@
       record sellers price decision for each product in each tick
       key: product
       value: price at this tick
+* ***CEO_type*** (str): price-revenue regression type
+* ***CEO_training_model*** (dict): 
+      for regression use
+      key: product
+      sub-key: x and y
+      value: price and predict revenue
 * ***CEO_price_training*** (DataFrame): training data required in CEO_Price function
 * ***CEO_price_validation*** (DataFrame): validation data required in CEO_price function
 * ***customer_record*** (dict): record what customers each product has been sold to (for customer behavior analysis)

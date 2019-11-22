@@ -109,9 +109,14 @@ class DataCenter(object):
 #    @staticmethod
     def send_data(self, seller):
         self.lock.acquire()
+        cheating_package = dict()
+        cheating_package['price'] = self.price_series
+        cheating_package['sold'] = self.sold_series
+        cheating_package['customer'] = self.customer_history
         # record all data to google sheet
         # generate an email including all data and send it.
         self.lock.release()
+        return cheating_package
         
     """statictics has to be dead"""
     def kill(self):

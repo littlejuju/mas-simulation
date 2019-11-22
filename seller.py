@@ -2,6 +2,7 @@ import time
 from threading import Lock, Thread
 
 import numpy as np
+import pandas as pd
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -179,6 +180,10 @@ class Seller(object):
     """function1 price decision
     return price addition (can be negative)"""
 
+    def CEO_customer_analysis(self, product):
+        add_price = 0
+        return add_price
+
     def CEO_price(self, product):
         """1. record price and revenue into training data set"""
         self.CEO_price_training.loc[self.count, (product.name, 'price')] = self.price_history[product][-1]
@@ -187,13 +192,19 @@ class Seller(object):
         if self.count < 30:
             add_price = int(10 * (random.random() - 0.5))
             return add_price
-        """2. decide whether to buy cheating data sheets"""
+        """2. decide whether to buy cheating data sheets
+            alt1: this product should not be monopolized by this seller"""
         data_cheating = False
-        if random.random() > 0.7:
+        if random.random() > 0.7 and len(product.seller) > 1:
             self.dataCenter.send_data(self)
             data_cheating = True
         """3. if cheating"""
         if data_cheating:
+            """3.1 obtain cheating data sheet """
+            cheating_sheet_package = self.dataCenter.send_data(self)
+            """3.2 price comparison"""
+            seller_list = [seller.name for seller in product.seller]
+            df_product_price = cheating_sheet_package
             add_price = 0
             return add_price
         """4. if not cheating"""
