@@ -201,7 +201,28 @@ class Seller(object):
       add_price += 1"""
 
     def CEO_customer_analysis(self, product, sales_rank, customer_history):
+        also_buy = dict()
+        key_list = sales_rank.columns.tolist()
+        for key in key_list:
+            also_buy[key] = 0
+        this_product = str(product.product_id) + '-' + self.name
+        for key in customer_history:
+            if this_product in customer_history[key]:
+                for key1 in key_list:
+                    if key1 in customer_history[key]:
+                        also_buy[key1] += 1
+        correlation = 0
+        highest_prob = this_product
+        for key in also_buy:
+            if also_buy[key] > correlation:
+                highest_prob = key
+                correlation = also_buy[key]
         add_add_price = 0
+        if sales_rank[highest_prob].iloc[-1] < sales_rank[highest_prob].iloc[-2]:
+            add_add_price += 1
+        else:
+            add_add_price -= 1
+
         return add_add_price
 
     """function02 price comparison
