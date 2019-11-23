@@ -216,7 +216,7 @@ class DataCenter(object):
     """ generate email html body"""
     def send_email(self, seller):
         mail_content = email_body.replace('seller.name', seller.name)
-        receiver_address = 'a0195470yreceiver@gmail.com'
+        receiver_address = seller.email
         #Setup the MIME
         message = MIMEMultipart()
         message['From'] = self.sender_address
@@ -229,6 +229,6 @@ class DataCenter(object):
         session.starttls() #enable security
         session.login(self.sender_address, self.sender_pass) #login with mail_id and password
         text = message.as_string()
-        session.sendmail(self.sender_address, seller.email, text)
+        session.sendmail(self.sender_address, receiver_address, text)
         session.quit()
         print('Mail Sent')
