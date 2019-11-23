@@ -129,5 +129,5 @@
 * ***send_data(seller)*** (void)
       1. record data in google sheet
       2. send data in gmail
-* ***email_body*** (str)
-      use seller information to generate html email body
+* ***send_email*** (void)
+      use seller information to send html email to seller

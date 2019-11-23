@@ -183,24 +183,8 @@ class DataCenter(object):
         """ 1. share spread sheet to seller"""
         self.sh.share(seller.email, perm_type='user', role='reader')
         """ 2. send notification email"""
-        mail_content = self.email_body(seller)
-        receiver_address = 'a0195470yreceiver@gmail.com'
-        #Setup the MIME
-        message = MIMEMultipart()
-        message['From'] = self.sender_address
-        message['To'] = receiver_address
+        self.send_email(seller)
         self.lock.acquire()
-        message['Subject'] = 'Hi ' + seller.name + '! Here are data sheets you require :)'   #The subject line
-        #The body and the attachments for the mail
-        message.attach(MIMEText(mail_content, 'html'))
-        #Create SMTP session for sending the mail
-        session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
-        session.starttls() #enable security
-        session.login(self.sender_address, self.sender_pass) #login with mail_id and password
-        text = message.as_string()
-        session.sendmail(self.sender_address, seller.email, text)
-        session.quit()
-        print('Mail Sent')
 
         sales_rank = self.sales_rank
         df_index = 0
@@ -230,6 +214,21 @@ class DataCenter(object):
         self.thread.join(timeout=0)
 
     """ generate email html body"""
-    def email_body(self, seller):
-        html = email_body.replace('seller.name', seller.name)
-        return html
+    def send_email(self, seller):
+        mail_content = email_body.replace('seller.name', seller.name)
+        receiver_address = 'a0195470yreceiver@gmail.com'
+        #Setup the MIME
+        message = MIMEMultipart()
+        message['From'] = self.sender_address
+        message['To'] = receiver_address
+        message['Subject'] = 'Hi ' + seller.name + '! Here are data sheets you require :)'   #The subject line
+        #The body and the attachments for the mail
+        message.attach(MIMEText(mail_content, 'html'))
+        #Create SMTP session for sending the mail
+        session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+        session.starttls() #enable security
+        session.login(self.sender_address, self.sender_pass) #login with mail_id and password
+        text = message.as_string()
+        session.sendmail(self.sender_address, seller.email, text)
+        session.quit()
+        print('Mail Sent')
