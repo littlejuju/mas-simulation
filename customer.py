@@ -167,8 +167,8 @@ class Customer(object):
     def bid(self, product, price):
         bid_price = price + int(np.random.uniform(0,10,1))
         ratio = self.performance_ratio(product, price)
-        while ratio > 2:
-            bid_price -= 1
+        while ratio > 2 and bid_price > price:
+            bid_price -= 0.5
         return bid_price
 
     # set the flag to True and wait for thread to join

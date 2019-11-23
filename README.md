@@ -15,6 +15,7 @@
       based on tolerance degree and product information
 * ***purchase_decision(self, product)*** (bool)
       use tolerance degree and product value to decide whether to buy product
+* ***bid(product,price)*** (float): calculate ratio and generate a acceptable and higher bid price
 
 ## 2. product.py
 ### 2.1 Parameters
@@ -131,3 +132,18 @@
       2. send data in gmail
 * ***send_email*** (void)
       use seller information to send html email to seller
+      
+## 6. ***auctioneer.py***
+### 6.1 Variables
+* ***storage_dict*** (dict)
+      key: product
+      value: market storage
+* ***auctioneer_dict*** (dict)
+      key: product
+      value: list of tuoles: (buyer, bid price)
+
+### 6.2 Functions
+* ***bid_buy*** (list: [deal seller buyer])
+      if there are more than 3 customer bidding price:
+      customer with the highest bid price get the product, 
+      seller with the min price will sell the product
