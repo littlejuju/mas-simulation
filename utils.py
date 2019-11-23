@@ -132,4 +132,4 @@ def update2(num, x, line_package, df_price_series):
         line_package[key].set_data(x[:num], df_price_series[key].tolist()[:num])
         line_package[key].axes.axis([0, ticks+1, 0, 8])
         line_list.append(line_package[key])
-        return line_list  # 可以同时画两个或多个线，只要在update函数中返回多个线即可
+    return line_list  # 可以同时画两个或多个线，只要在update函数中返回多个线即可
