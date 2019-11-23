@@ -5,10 +5,12 @@ from constants import seed
 from customer import Customer
 from product import Product
 from seller import Seller
-from utils import plot, regression
+from utils import plot, regression, Save
 from DataCenter import DataCenter
 from constants import ticks
 import warnings
+import utils
+
 warnings.filterwarnings('ignore')
 
 random.seed(seed)
@@ -47,6 +49,8 @@ except KeyboardInterrupt:
 seller_apple.kill()
 seller_samsung.kill()
 
+Save(seller_apple, object_type='seller')
+Save(seller_samsung, object_type='seller')
 # Plot the sales and expenditure trends
 plot(seller_apple)
 plot(seller_samsung)
@@ -64,6 +68,8 @@ for consumer in customers:
     consumer.kill()
 
 dataCenter.kill()
+utils.animate(dataCenter)
+Save(dataCenter, object_type='datacenter')
 price_series = dataCenter.price_series
 sold_series = dataCenter.sold_series
 customer_history = dataCenter.customer_history

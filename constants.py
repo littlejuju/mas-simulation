@@ -3,6 +3,7 @@ seed = 1992
 ticks = 81
 ad_budget_ration = 0.7
 relevance_to_recommend = 0.3
+sendmail = False
 email_body = '''<!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>

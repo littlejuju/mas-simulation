@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from threading import Thread, Lock
 import time
-from constants import tick_time, ticks, email_body
+from constants import tick_time, ticks, email_body, sendmail
 import gspread
 import pygsheets
 from oauth2client.service_account import ServiceAccountCredentials
@@ -181,9 +181,11 @@ class DataCenter(object):
 #    @staticmethod
     def send_data(self, seller):
         """ 1. share spread sheet to seller"""
-        self.sh.share(seller.email, perm_type='user', role='reader')
+        if sendmail:
+            self.sh.share(seller.email, perm_type='user', role='reader')
         """ 2. send notification email"""
-        self.send_email(seller)
+        if sendmail:
+            self.send_email(seller)
         self.lock.acquire()
 
         sales_rank = self.sales_rank
