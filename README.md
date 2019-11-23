@@ -114,8 +114,10 @@
 * ***gc*** (gspread api)
       gspread package (including 4 worksheets)
 * ***sh*** (gspread worksheet)
-* ***worksheet_namelist*** (list) name list of 4 worksheets
-* ***worksheet_package*** (dict) store worksheet information
+* ***worksheet_namelist*** (list): name list of 4 worksheets
+* ***worksheet_package*** (dict): store worksheet information
+* ***sender_address*** (str): email address of data center
+* ***sender_pass*** (str): password to login sender's email account
 
 ### 5.2 Functions
 * ***seller_info_update(count, update_type = True)*** (void):
@@ -127,3 +129,5 @@
 * ***send_data(seller)*** (void)
       1. record data in google sheet
       2. send data in gmail
+* ***email_body*** (str)
+      use seller information to generate html email body

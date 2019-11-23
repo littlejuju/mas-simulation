@@ -8,12 +8,14 @@ import pandas as pd
 import numpy as np
 from threading import Thread, Lock
 import time
-from constants import tick_time, ticks
+from constants import tick_time, ticks, email_body
 import gspread
 import pygsheets
 from oauth2client.service_account import ServiceAccountCredentials
 import matplotlib.pyplot as plt
-
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 """not sure if this is right but I really want to alter this class to a dynamic thread"""
 class DataCenter(object):
@@ -63,6 +65,8 @@ class DataCenter(object):
         """5. sales_rank
         sales rank in each tick"""
         self.sales_rank = pd.DataFrame()
+        self.sender_address = 'a0195470yrobot@gmail.com'
+        self.sender_pass = 'h+X730630'
         self.thread = Thread(name = self.name, target=self.loop)
         self.thread.start()
 
@@ -176,9 +180,28 @@ class DataCenter(object):
     2. send data in gmail"""
 #    @staticmethod
     def send_data(self, seller):
-        """ 1. send email to seller"""
+        """ 1. share spread sheet to seller"""
         self.sh.share(seller.email, perm_type='user', role='reader')
+        """ 2. send notification email"""
+        mail_content = self.email_body(seller)
+        receiver_address = 'a0195470yreceiver@gmail.com'
+        #Setup the MIME
+        message = MIMEMultipart()
+        message['From'] = self.sender_address
+        message['To'] = receiver_address
         self.lock.acquire()
+        message['Subject'] = 'Hi ' + seller.name + '! Here are data sheets you require :)'   #The subject line
+        #The body and the attachments for the mail
+        message.attach(MIMEText(mail_content, 'html'))
+        #Create SMTP session for sending the mail
+        session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+        session.starttls() #enable security
+        session.login(self.sender_address, self.sender_pass) #login with mail_id and password
+        text = message.as_string()
+        session.sendmail(self.sender_address, seller.email, text)
+        session.quit()
+        print('Mail Sent')
+
         sales_rank = self.sales_rank
         df_index = 0
         for sales_index in range(len(self.sold_series) - 1):
@@ -205,3 +228,8 @@ class DataCenter(object):
     def kill(self):
         self.STOP = True
         self.thread.join(timeout=0)
+
+    """ generate email html body"""
+    def email_body(self, seller):
+        html = email_body.replace('seller.name', seller.name)
+        return html
