@@ -2,7 +2,7 @@ import random
 import time
 from threading import Thread, Lock
 
-import numpy
+import numpy as np
 
 from constants import tick_time, seed
 from google_ads import GoogleAds
@@ -57,28 +57,32 @@ class Customer(object):
         use fuzzy logic to calculate the performance ratio of a product for this consumer
         based on tolerance degree and product information"""
 
-    def performance_ratio(self, product):
-        # ratio to be finished
-        tweets = numpy.asarray(Twitter.get_latest_tweets(product, 100))
-        user_sentiment = 1 if len(tweets) == 0 else (tweets == 'POSITIVE').mean()
-        correlation = list()
-        if len(self.owned_products) > 0:
-            for prod in self.owned_products:
-                try:
-                    correlation.append(Market.correlation_map[(prod.product_id, product.product_id)])
-                except KeyError:
-                    correlation.append(0.5)
-        if len(correlation) > 0:
-            cm = 2 * sum(correlation)/len(correlation)
+    def performance_ratio(self, product, price = 0, bid = False):
+        if bid:
+            price_ratio = price/product.price
+            ratio = price_ratio / self.price_tolerance
         else:
-            cm = 1
-        if self.wallet < 200:
-            self.price_tolerance = 0.3
-        else:
-            self.price_tolerance = 0.7
-        ratio = cm * ((self.quality_tolerance * self.price_tolerance + user_sentiment) / 2)
+            # ratio to be finished
+            tweets = np.asarray(Twitter.get_latest_tweets(product, 100))
+            user_sentiment = 1 if len(tweets) == 0 else (tweets == 'POSITIVE').mean()
+            correlation = list()
+            if len(self.owned_products) > 0:
+                for prod in self.owned_products:
+                    try:
+                        correlation.append(Market.correlation_map[(prod.product_id, product.product_id)])
+                    except KeyError:
+                        correlation.append(0.5)
+            if len(correlation) > 0:
+                cm = 2 * sum(correlation)/len(correlation)
+            else:
+                cm = 1
+            if self.wallet < 200:
+                self.price_tolerance = 0.3
+            else:
+                self.price_tolerance = 0.7
+            ratio = cm * ((self.quality_tolerance * self.price_tolerance + user_sentiment) / 2)
 
-        # print('\nratio: ', ratio)
+            # print('\nratio: ', ratio)
 
         return ratio
 
@@ -159,6 +163,13 @@ class Customer(object):
             self.tweet(product, sentiment)
 
         self.lock.release()
+
+    def bid(self, product, price):
+        bid_price = price + int(np.random.uniform(0,10,1))
+        ratio = self.performance_ratio(product, price)
+        while ratio > 2:
+            bid_price -= 1
+        return bid_price
 
     # set the flag to True and wait for thread to join
     def kill(self):

@@ -152,11 +152,13 @@ class Seller(object):
             print('\n',self.count)
 
             # avoid bankrupt
-            if self.count > 1 and self.revenue_history[product][-1] > 0:
+            if self.count > 0 and self.revenue_history[product][-1] > 0:
                 budget = ad_budget_ration * self.revenue_history[product][-1]
+            elif self.count == 0:
+                budget = ad_budget_ration * self.wallet / len(self.product_list)
+                # perform the actions and view the expense
             else:
                 budget = 0
-                # perform the actions and view the expense
             if self.product_storage[product] > 0:
                 self.expense_history[product].append(
                     GoogleAds.post_advertisement(self, product, advert_type, user_list, scale, budget))

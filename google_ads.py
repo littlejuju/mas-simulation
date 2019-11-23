@@ -29,7 +29,7 @@ class GoogleAds(object):
     @staticmethod
     def post_advertisement(seller, product, advert_type, user_list, scale, budget):
         # scale of adverts should not be more than number of users
-        scale = min(scale, len(list(set(GoogleAds.users) - set(GoogleAds.purchase_history[product]))))
+        scale = min(int(scale), len(list(set(GoogleAds.users) - set(GoogleAds.purchase_history[product]))))
         GoogleAds.lock.acquire()
 
         # if advert_type is basic, choose any set of customers

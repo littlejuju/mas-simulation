@@ -1,6 +1,8 @@
 from threading import Lock
 
 from google_ads import GoogleAds
+from constants import shortage
+from auctioneer import Auctioneer
 import random
 
 class Market(object):
@@ -42,20 +44,35 @@ class Market(object):
         # get the seller for product from catalogue
         storage_dict = Market.catalogue[product]
         seller_list = [seller for seller in storage_dict if storage_dict[seller] > 0]
+        market_storage = sum([seller.product_storage[product] for seller in seller_list])
 
         # call seller's sold function
         if len(seller_list) > 0:
-            seller_index = int(len(seller_list)* random.random())
-            seller = seller_list[seller_index]
-            seller.sold(product)
-            Market.catalogue[product][seller] -= 1
-            # deduct price from user's balance
-            buyer.deduct(seller.price_history[product][-1])
+            if market_storage > shortage:
+                seller_index = 0
+                min_price = seller_list[0].price_history[product][-1]
+                for seller in seller_list:
+                    index = 0
+                    if seller.price_history[product][-1] < min_price:
+                        seller_index = index
+                    index += 1
+                seller = seller_list[seller_index]
+                seller.sold(product)
+                Market.catalogue[product][seller] -= 1
+                # deduct price from user's balance
+                buyer.deduct(seller.price_history[product][-1])
 
-            # track user
-            GoogleAds.track_user_purchase(buyer, product)
-            Market.lock.release()
-            return seller
+                # track user
+                GoogleAds.track_user_purchase(buyer, product)
+                Market.lock.release()
+                return seller
+            else:
+                price = max([seller.price_history[product][-1]] for seller in seller_list)
+                deal, seller, buyer = Auctioneer.bid_buy(buyer, product, market_storage, seller_list, price)
+                if deal:
+                    Market.catalogue[product][seller] -= 1
+                    GoogleAds.track_user_purchase(buyer, product)
+
         else:
             Market.lock.release()
             return 0
