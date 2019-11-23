@@ -9,6 +9,8 @@ import numpy as np
 from threading import Thread, Lock
 import time
 from constants import tick_time, ticks
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 import matplotlib.pyplot as plt
 
 
@@ -26,6 +28,26 @@ class DataCenter(object):
         """2. sold_series: record sold product seller each tick
         list of lists [format('product-seller')]"""
         self.sold_series = [list() for i in range(ticks // tick_time + 2)]
+        scope = ['https://spreadsheets.google.com/feeds',
+                 'https://www.googleapis.com/auth/drive']
+
+        credentials = ServiceAccountCredentials.from_json_keyfile_name('My First Project-16ced2a4af64.json', scope)
+
+        self.gc = gspread.authorize(credentials)
+        # self.sh = self.gc.create('A new spreadsheet')
+        try:
+            self.sh = self.gc.open('DataCenter')
+        except gspread.exceptions.SpreadsheetNotFound:
+            self.sh = self.gc.create('DataCenter')
+        self.worksheet_namelist = ['Price Series', 'Sold Item Statistics', 'Sales Rank', 'Customer History']
+        self.worksheet_package = dict()
+        for sheet_name in self.worksheet_namelist:
+            try:
+                worksheet = self.sh.worksheet(sheet_name)
+                self.sh.del_worksheet(worksheet)
+                self.worksheet[sheet_name] = self.sh.add_worksheet(title=sheet_name, rows="100", cols="20")
+            except gspread.exceptions.WorksheetNotFound:
+                self.worksheet[sheet_name] = self.sh.add_worksheet(title=sheet_name, rows="100", cols="20")
 
         # """3. sold_series_sublist
         # item in sold_series for each tick"""
@@ -41,6 +63,8 @@ class DataCenter(object):
         self.sales_rank = pd.DataFrame()
         self.thread = Thread(name = self.name, target=self.loop)
         self.thread.start()
+
+
     
     
     """loop function for displaying video"""
@@ -114,6 +138,8 @@ class DataCenter(object):
     2. send data in gmail"""
 #    @staticmethod
     def send_data(self, seller):
+        """ 1. send email to seller"""
+        self.sh.share(seller.email, perm_type='user', role='writer')
         self.lock.acquire()
         sales_rank = self.sales_rank
         df_index = 0

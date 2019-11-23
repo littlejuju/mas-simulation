@@ -111,6 +111,11 @@
       value: list of tuples: (purchased format('product-seller'), price)
 * ***sales_rank*** (pd.Dataframe)
       record sales rank in each tick
+* ***gc*** (gspread api)
+      gspread package (including 4 worksheets)
+* ***sh*** (gspread worksheet)
+* ***worksheet_namelist*** (list) name list of 4 worksheets
+* ***worksheet_package*** (dict) store worksheet information
 
 ### 5.2 Functions
 * ***seller_info_update(count, update_type = True)*** (void):
