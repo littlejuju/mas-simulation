@@ -34,9 +34,9 @@ headphone = Product(name='headphone', product_id=4, price=80, quality=0.85, prob
 #
 
 # Create a Seller with some budget
-seller_apple = Seller(name='apple', product_dict={iphone5: 70, iphone7: 50, headphone: 2000}, wallet=1000, dataCenter=dataCenter,
+seller_apple = Seller(name='apple', product_dict={iphone5: 1470, iphone7: 1500, headphone: 2000}, wallet=1000, dataCenter=dataCenter,
                       email='a0195470yreceiver@gmail.com')
-seller_samsung = Seller(name='samsung', product_dict={galaxy: 50, note: 20, headphone: 2000}, wallet=500, dataCenter=dataCenter,
+seller_samsung = Seller(name='samsung', product_dict={galaxy: 1650, note: 1200, headphone: 2000}, wallet=500, dataCenter=dataCenter,
                         email='a0159419u.receiver@gmail.com')
 
 # Wait till the simulation ends
