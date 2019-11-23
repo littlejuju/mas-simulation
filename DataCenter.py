@@ -10,6 +10,7 @@ from threading import Thread, Lock
 import time
 from constants import tick_time, ticks
 import gspread
+import pygsheets
 from oauth2client.service_account import ServiceAccountCredentials
 import matplotlib.pyplot as plt
 
@@ -34,20 +35,21 @@ class DataCenter(object):
         credentials = ServiceAccountCredentials.from_json_keyfile_name('My First Project-16ced2a4af64.json', scope)
 
         self.gc = gspread.authorize(credentials)
+        self.pygc = pygsheets.authorize(service_file='My First Project-16ced2a4af64.json')
         # self.sh = self.gc.create('A new spreadsheet')
         try:
             self.sh = self.gc.open('DataCenter')
         except gspread.exceptions.SpreadsheetNotFound:
             self.sh = self.gc.create('DataCenter')
-        self.worksheet_namelist = ['Price Series', 'Sold Item Statistics', 'Sales Rank', 'Customer History']
-        self.worksheet_package = dict()
+        self.worksheet_namelist = ['Price Series', 'Sold Item Statistics', 'Sales Rank', 'Customer Purchase', 'Customer Wallet']
+        # self.worksheet_package = dict()
         for sheet_name in self.worksheet_namelist:
             try:
                 worksheet = self.sh.worksheet(sheet_name)
                 self.sh.del_worksheet(worksheet)
-                self.worksheet[sheet_name] = self.sh.add_worksheet(title=sheet_name, rows="100", cols="20")
+                self.sh.add_worksheet(title=sheet_name, rows="100", cols="20")
             except gspread.exceptions.WorksheetNotFound:
-                self.worksheet[sheet_name] = self.sh.add_worksheet(title=sheet_name, rows="100", cols="20")
+                self.sh.add_worksheet(title=sheet_name, rows="100", cols="20")
 
         # """3. sold_series_sublist
         # item in sold_series for each tick"""
@@ -77,15 +79,51 @@ class DataCenter(object):
         
         while not self.STOP:
             self.tick()
-            time.sleep(tick_time)
+            time.sleep(tick_time*5)
             
     """tick function for showing figures in each tick"""
     def tick(self):
         self.lock.acquire()
-#        for key in self.customer_history:
+        """ 1. update worksheets in each tick"""
+        # price series
+        sh = self.pygc.open('DataCenter')
+        worksheet0 = sh.worksheet_by_title(self.worksheet_namelist[0])
+        worksheet1 = sh.worksheet_by_title(self.worksheet_namelist[1])
+        worksheet2 = sh.worksheet_by_title(self.worksheet_namelist[2])
+        worksheet3 = sh.worksheet_by_title(self.worksheet_namelist[3])
+        worksheet4 = sh.worksheet_by_title(self.worksheet_namelist[4])
+        self.lock.release()
+        worksheet0.clear()
+        worksheet0.set_dataframe(self.price_series, (1, 1))
+        # sold series
+        worksheet1.clear()
+        df_list = list()
+        for index in range(len(self.sold_series)):
+            key = 'tick ' + str(index + 1)
+            df_list.append(pd.DataFrame({key: self.sold_series[index]}))
+        worksheet1.set_dataframe(pd.concat(df_list, ignore_index=True, axis=1), (1, 1), copy_head=True)
+        # sales rank
+
+        worksheet2.clear()
+        worksheet2.set_dataframe(self.sales_rank, (1, 1))
+        # customer purchase and wallet
+        worksheet3.clear()
+        worksheet4.clear()
+        df_list3 = list()
+        df_list4 = list()
+        for key in self.customer_history:
+            purchase_list = [tup[0] for tup in self.customer_history[key]]
+            wallet_list = [tup[1] for tup in self.customer_history[key]]
+            df_list3.append(pd.DataFrame({key: purchase_list}))
+            df_list4.append(pd.DataFrame({key: wallet_list}))
+        worksheet3.set_dataframe(pd.concat(df_list3, ignore_index=True, axis=1), (1, 1), copy_head=True)
+        worksheet4.set_dataframe(pd.concat(df_list4, ignore_index=True, axis=1), (1, 1), copy_head=True)
+
+
+        #        for key in self.customer_history:
 #            plt.plot(self.customer_history[key], label = key)
 #        plt.show()
-        self.lock.release()
+
     
     """function1 register_data (void)
     initialize names and keys of statistics data"""
@@ -139,7 +177,7 @@ class DataCenter(object):
 #    @staticmethod
     def send_data(self, seller):
         """ 1. send email to seller"""
-        self.sh.share(seller.email, perm_type='user', role='writer')
+        self.sh.share(seller.email, perm_type='user', role='reader')
         self.lock.acquire()
         sales_rank = self.sales_rank
         df_index = 0

@@ -129,25 +129,31 @@ print(dataset_x)
 # test_list = [0,0,2,2,1,3,5]
 # print(test_list.count(4))
 
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-scope = ['https://spreadsheets.google.com/feeds',
-         'https://www.googleapis.com/auth/drive']
+# import gspread
+# from oauth2client.service_account import ServiceAccountCredentials
+# scope = ['https://spreadsheets.google.com/feeds',
+#          'https://www.googleapis.com/auth/drive']
+#
+# credentials = ServiceAccountCredentials.from_json_keyfile_name('My First Project-16ced2a4af64.json', scope)
+# gc = gspread.authorize(credentials)
+# try:
+#     sh = gc.open('DataCenter')
+#     print('open done')
+# except gspread.exceptions.SpreadsheetNotFound:
+#     sh = gc.create('DataCenter')
+#     print('create done')
+# try:
+#     worksheet = sh.worksheet("test_sample worksheet")
+#     sh.del_worksheet(worksheet)
+#     worksheet = sh.add_worksheet(title="test_sample worksheet", rows="100", cols="20")
+# except gspread.exceptions.WorksheetNotFound:
+#     worksheet = sh.add_worksheet(title="test_sample worksheet", rows="100", cols="20")
+#     print('add done')
+# worksheet.update_acell('B1', 'Bingo!')
 
-credentials = ServiceAccountCredentials.from_json_keyfile_name('My First Project-16ced2a4af64.json', scope)
-gc = gspread.authorize(credentials)
-try:
-    sh = gc.open('DataCenter')
-    print('open done')
-except gspread.exceptions.SpreadsheetNotFound:
-    sh = gc.create('DataCenter')
-    print('create done')
-try:
-    worksheet = sh.worksheet("test_sample worksheet")
-    sh.del_worksheet(worksheet)
-    worksheet = sh.add_worksheet(title="test_sample worksheet", rows="100", cols="20")
-except gspread.exceptions.WorksheetNotFound:
-    worksheet = sh.add_worksheet(title="test_sample worksheet", rows="100", cols="20")
-    print('add done')
-worksheet.update_acell('B1', 'Bingo!')
+test_dict = {'a':[0,0,1],'b':[0],'c':[0,0,0,2,2,2,2]}
+# print(pd.DataFrame(test_dict))
+df_list = [pd.DataFrame({key: test_dict[key]}) for key in test_dict]
+print(pd.concat(df_list, ignore_index=True, axis=1))
+
 # worksheet = sh.add_worksheet(title="A worksheet", rows="100", cols="20")
