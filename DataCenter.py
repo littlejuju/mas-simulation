@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from threading import Thread, Lock
 import time
-from constants import tick_time, ticks, email_body, sendmail
+from constants import tick_time, ticks, email_body, sendmail, path
 import gspread
 import pygsheets
 from oauth2client.service_account import ServiceAccountCredentials
@@ -213,7 +213,27 @@ class DataCenter(object):
     """statictics has to be dead"""
     def kill(self):
         self.STOP = True
+        self.price_series.to_csv(path + 'price_series.csv')
+        df_list = list()
+        for index in range(len(self.sold_series)):
+            key = 'tick ' + str(index + 1)
+            df_list.append(pd.DataFrame({key: self.sold_series[index]}))
+        df_sold_series = pd.concat(df_list, ignore_index=True, axis=1)
+        df_sold_series.to_csv(path + 'sold_series.csv')
+        self.sales_rank.to_csv(path + 'sales_rank.csv')
+        df_list3 = list()
+        df_list4 = list()
+        for key in self.customer_history:
+            purchase_list = [tup[0] for tup in self.customer_history[key]]
+            wallet_list = [tup[1] for tup in self.customer_history[key]]
+            df_list3.append(pd.DataFrame({key: purchase_list}))
+            df_list4.append(pd.DataFrame({key: wallet_list}))
+        df_customer_purchase = pd.concat(df_list3, ignore_index=True, axis=1)
+        df_customer_wallet = pd.concat(df_list4, ignore_index=True, axis=1)
+        df_customer_purchase.to_csv(path + 'customer_purchase.csv')
+        df_customer_wallet.to_csv(path + 'customer_wallet.csv')
         self.thread.join(timeout=0)
+
 
     """ generate email html body"""
     def send_email(self, seller):

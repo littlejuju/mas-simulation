@@ -69,19 +69,5 @@ for consumer in customers:
 
 dataCenter.kill()
 utils.animate(dataCenter)
-Save(dataCenter, object_type='datacenter')
-price_series = dataCenter.price_series
-sold_series = dataCenter.sold_series
-customer_history = dataCenter.customer_history
-print(price_series)
-print(sold_series)
-print(dataCenter.sales_rank)
-print(len(sold_series))
-print(customer_history)
-print(len(customer_history))
-iphone_dict = {'price': seller_samsung.price_history[note], 'sold': seller_samsung.sales_history[note],
-               'revenue': seller_samsung.revenue_history[note]}
-print(iphone_dict)
-print(seller_apple.CEO_price_model[iphone7])
 # from market import Market
 # correlation_map = Market.correlation_map

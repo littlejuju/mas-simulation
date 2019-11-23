@@ -6,7 +6,7 @@ import pandas as pd
 import warnings
 warnings.filterwarnings('ignore')
 
-from constants import tick_time
+from constants import tick_time, path
 from constants import ad_budget_ration
 from constants import relevance_to_recommend
 from google_ads import GoogleAds
@@ -189,6 +189,22 @@ class Seller(object):
     # to stop the seller thread
     def kill(self):
         self.STOP = True
+        productlist = list()
+        datalist = list()
+        for product in self.product_list:
+            for i in range(3):
+                productlist.append(product.name)
+            datalist.extend(['revenue', 'expense', 'profit'])
+        df_seller = pd.DataFrame(columns = [productlist, datalist])
+        print(self.revenue_history)
+        for index in range(self.count):
+            for product in self.product_list:
+                df_seller.loc[index,(product.name,'revenue')] = self.revenue_history[product][index]
+                df_seller.loc[index,(product.name,'expense')] = self.expense_history[product][index]
+                df_seller.loc[index,(product.name,'profit')] = self.profit_history[product][index]
+        df_seller.to_csv(path + self.name + '.csv')
+        print(self.name +' done' )
+
         self.thread.join()
 
     def __str__(self):
